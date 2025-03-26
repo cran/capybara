@@ -279,7 +279,8 @@ vec variance_(const vec &mu, const double &theta,
   double null_dev = dev_resids_(y, ymean, theta, wt, family_type);
   bool dev_crit, val_crit, imp_crit, conv = false;
   double dev_old, dev_ratio, dev_ratio_inner, rho;
-  vec mu_eta(n), w(n), nu(n), beta_upd(k), eta_upd(n), eta_old(n), beta_old(k);
+  vec mu_eta(n), w(n), nu(n), beta_upd(k), eta_upd(n), eta_old(n), beta_old(k),
+      nu_old = vec(n, fill::zeros);
   mat H(p, p);
 
   // Maximize the log-likelihood
@@ -296,7 +297,9 @@ vec variance_(const vec &mu, const double &theta,
 
     // Center variables
 
-    MNU += nu;
+    MNU += (nu - nu_old);
+    nu_old = nu;
+
     center_variables_(MNU, w, k_list, center_tol, iter_center_max,
                       iter_interrupt);
     center_variables_(MX, w, k_list, center_tol, iter_center_max,
@@ -313,8 +316,7 @@ vec variance_(const vec &mu, const double &theta,
     eta_upd = MX * beta_upd + nu - MNU;
 
     for (iter_inner = 0; iter_inner < iter_inner_max; ++iter_inner) {
-      eta = eta_old;
-      eta += rho * eta_upd;
+      eta = eta_old + rho * eta_upd;
       beta = beta_old + rho * beta_upd;
       mu = link_inv_(eta, family_type);
       dev = dev_resids_(y, mu, theta, wt, family_type);
@@ -354,10 +356,6 @@ vec variance_(const vec &mu, const double &theta,
       conv = true;
       break;
     }
-
-    // Update starting guesses for acceleration
-
-    MNU -= nu;
   }
 
   // Information if convergence failed
@@ -376,20 +374,16 @@ vec variance_(const vec &mu, const double &theta,
 
   // Generate result list
 
-  writable::list out(8);
-
-  out[0] = as_doubles(beta);
-  out[1] = as_doubles(eta);
-  out[2] = as_doubles(wt);
-  out[3] = as_doubles_matrix(H);
-  out[4] = writable::doubles({dev});
-  out[5] = writable::doubles({null_dev});
-  out[6] = writable::logicals({conv});
-  out[7] = writable::integers({static_cast<int>(iter + 1)});
-
-  out.attr("names") =
-      writable::strings({"coefficients", "eta", "weights", "hessian",
-                         "deviance", "null_deviance", "conv", "iter"});
+  writable::list out = writable::list({
+      "coefficients"_nm = as_doubles(beta),
+      "eta"_nm = as_doubles(eta),
+      "weights"_nm = as_doubles(wt),
+      "hessian"_nm = as_doubles_matrix(H),
+      "deviance"_nm = writable::doubles({dev}),
+      "null_deviance"_nm = writable::doubles({null_dev}),
+      "conv"_nm = writable::logicals({conv}),
+      "iter"_nm = writable::integers({static_cast<int>(iter + 1)}),
+  });
 
   if (keep_mx) {
     mat x_cpp = as_Mat(x_r);

@@ -1,6 +1,6 @@
-9efc6ccc835defd83f020e1e2e01ce07 *DESCRIPTION
+da4c1770a12d0376acf51418371d6ae4 *DESCRIPTION
 44299102e5836ab15617ba8cddc85338 *NAMESPACE
-0bba59840f03820da26a337bf0207406 *NEWS.md
+5482de17db3c05940447609acecf676f *NEWS.md
 c3733c89d4e95fa4de9565bc564a1ddf *R/apes.R
 faaf443a9c45a7bcced003e5f33bd50e *R/apes_bias_helpers.R
 9ee881115dc5e8cf23aa506517dbec81 *R/autoplot.R
@@ -26,7 +26,7 @@ e72fd2e74f69003f60c29542c3653ed2 *R/generics_predict.R
 998d5989c2c9ddd8b288ebdcec292e64 *R/generics_summary.R
 8326f888bc8c2b854c329bab93982f0b *R/generics_tidy.R
 7ab5dc8ae756b5803f26d9c9dc4bc51e *R/generics_vcov.R
-b7d0265b9d71e550a5e5c8ef1970b685 *README.md
+7f0b51e8fccfac2af444cb4b72c2035e *README.md
 2001e27260153cb942270db229280fe4 *build/vignette.rds
 2fc7f3f32d55b0e20814382acb8a4597 *cleanup
 9cada31376592573da382615b983e516 *configure
@@ -53,9 +53,9 @@ c0cf98605e62c1d29a8d2a64053cb855 *man/reexports.Rd
 219d8e8add8e422a7be4d0f17c570a71 *man/vcov.felm.Rd
 b69ac828c7576b235ef809ad034fd385 *src/00_main.h
 ef7a1a84872b2aaa88ce36d3f9b0cadf *src/01_linear_algebra.cpp
-f1c116e29ccbb92068717b54d0b2feb1 *src/02_center_variables.cpp
-0d40d2f6a14f2cc140077e1f67e19cb2 *src/03_lm_fit.cpp
-d17643dfd6afc2ccf722bddfc53871a1 *src/04_glm_fit.cpp
+4c231e81f66abfe8fc7edf7f1525751b *src/02_center_variables.cpp
+13e6f1d57ddb61047bb3d45f6145b69e *src/03_lm_fit.cpp
+e292ee695158a954a2b59dbf37398499 *src/04_glm_fit.cpp
 5e87abafa8f144c0e986ddbc8d3be89c *src/05_glm_offset_fit.cpp
 ef361fac6224ef2a99650a2271bd702d *src/06_get_alpha.cpp
 f0457d9f36f9ffca290753a86cdced55 *src/07_group_sums.cpp

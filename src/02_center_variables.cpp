@@ -41,12 +41,12 @@ void center_variables_(mat &V, const vec &w, const list &klist,
     x = V.col(p);
     ratio0 = std::numeric_limits<double>::max();
 
-    if (iter == iter_check_interrupt) {
-      check_user_interrupt();
-      iter_check_interrupt += iter_check_interrupt0;
-    }
-
     for (iter = 0; iter < I; ++iter) {
+      if (iter == iter_check_interrupt) {
+        check_user_interrupt();
+        iter_check_interrupt += iter_check_interrupt0;
+      }
+      
       x0 = x;
 
       for (l = 0; l < K; ++l) {
