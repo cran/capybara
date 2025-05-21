@@ -1,34 +1,37 @@
 #include "00_main.h"
 
-mat crossprod_(const mat &X, const vec &w) {
-  mat Y = X;
-  Y.each_col() %= sqrt(w);
-  return Y.t() * Y;
+// Check if the rank of R is less than p
+// Demmel Ch. 3: If m >> n, QR and SVD have similar cost. Otherwise, QR is a bit
+// cheaper.
+// Armadillo's rank() uses SVD, here we count non-zero pivots with an econ-QR
+[[cpp11::register]] int check_linear_dependence_qr_(const doubles &y,
+                                                    const doubles_matrix<> &x,
+                                                    const int &p) {
+  const uword n = x.nrow();
+  const uword m = x.ncol();
+  mat X(n, m + 1, fill::none);
+  X.cols(0, m - 1) = as_mat(x);
+  X.col(m) = as_col(y);
+
+  mat Q, R;
+  if (!qr_econ(Q, R, X)) {
+    stop("QR decomposition failed");
+  }
+
+  double tol_qr = std::numeric_limits<double>::epsilon() *
+                  std::max(X.n_rows, X.n_cols) * norm(R, "inf");
+  int r = accu(arma::abs(diagvec(R)) > tol_qr);
+
+  return (r < p) ? 1 : 0;
 }
 
-// vec solve_beta_(mat MX, const mat &MNU,
-//                         const vec &w) {
-//   const vec sqrt_w = sqrt(w);
-//   MX.each_col() %= sqrt_w;
-
-//   mat Q, R;
-//   if (!qr_econ(Q, R, MX)) {
-//     stop("QR decomposition failed");
-//   }
-
-//   return solve(trimatu(R), Q.t() * (MNU.each_col() % sqrt_w),
-//   solve_opts::fast);
-// }
+mat crossprod_(const mat &X, const vec &w) { return X.t() * diagmat(w) * X; }
 
 // Cholesky decomposition
-vec solve_beta_(mat MX, const mat &MNU, const vec &w) {
-  const vec sqrt_w = sqrt(w);
-
-  MX.each_col() %= sqrt_w;
-  mat WMNU = MNU.each_col() % sqrt_w;
-
-  mat XtX = MX.t() * MX;
-  vec XtY = MX.t() * (MNU.each_col() % sqrt_w);
+vec solve_beta_(mat &MX, const mat &MNU, const vec &w) {
+  mat MXW = MX.t() * diagmat(w);
+  mat XtX = MXW * MX;
+  vec XtY = MXW * MNU;
 
   // XtX = L * L.t()
   mat L;

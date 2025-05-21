@@ -3,7 +3,7 @@
 [[cpp11::register]] list get_alpha_(const doubles_matrix<> &p_r,
                                     const list &klist, const list &control) {
   // Types conversion
-  vec p = as_Mat(p_r);
+  const vec p = as_Mat(p_r);
 
   // Auxiliary variables (fixed)
   const double tol = as_cpp<double>(control["center_tol"]);
@@ -13,7 +13,7 @@
   // Auxiliary variables (storage)
   size_t j, k, l, iter, J, J1, J2, interrupt_iter = interrupt_iter0;
   double num, denom, ratio;
-  vec y(p.n_elem);
+  vec y(p.n_elem, fill::none);
 
   // Pre-compute list sizes
   field<int> list_sizes(K);
@@ -85,7 +85,7 @@
       denom += dot(Alpha0(k), Alpha0(k));
     }
 
-    ratio = sqrt(num / denom);
+    ratio = sqrt(num / denom + 1e-16);
     if (ratio < tol) {
       break;
     }

@@ -248,12 +248,12 @@ vec variance_(const vec &mu, const double &theta,
                                     const std::string &family,
                                     const list &control, const list &k_list) {
   // Type conversion
+  mat MX = as_Mat(x_r);
   vec beta = as_Col(beta_r);
   vec eta = as_Col(eta_r);
-  vec y = as_Col(y_r);
-  mat MX = as_Mat(x_r);
+  const vec y = as_Col(y_r);
   vec MNU = vec(y.n_elem, fill::zeros);
-  vec wt = as_Col(wt_r);
+  const vec wt = as_Col(wt_r);
 
   // Auxiliary variables (fixed)
 
@@ -266,21 +266,22 @@ vec variance_(const vec &mu, const double &theta,
                iter_center_max = as_cpp<size_t>(control["iter_center_max"]),
                iter_inner_max = as_cpp<size_t>(control["iter_inner_max"]),
                iter_interrupt = as_cpp<size_t>(control["iter_interrupt"]),
-               iter_ssr = as_cpp<size_t>(control["iter_ssr"]),
-               n = y.n_elem, p = MX.n_cols, k = beta.n_elem;
+               iter_ssr = as_cpp<size_t>(control["iter_ssr"]), n = y.n_elem,
+               p = MX.n_cols, k = beta.n_elem;
 
   // Auxiliary variables (storage)
 
   size_t iter, iter_inner;
-  vec mu = link_inv_(eta, family_type);
-  vec ymean = mean(y) * vec(y.n_elem, fill::ones);
-  double dev = dev_resids_(y, mu, theta, wt, family_type);
-  double null_dev = dev_resids_(y, ymean, theta, wt, family_type);
-  bool dev_crit, val_crit, imp_crit, conv = false;
-  double dev_old, dev_ratio, dev_ratio_inner, rho;
-  vec mu_eta(n), w(n), nu(n), beta_upd(k), eta_upd(n), eta_old(n), beta_old(k),
+  vec mu = link_inv_(eta, family_type),
+      ymean = mean(y) * vec(y.n_elem, fill::ones), mu_eta(n, fill::none),
+      w(n, fill::none), nu(n, fill::none), beta_upd(k, fill::none),
+      eta_upd(n, fill::none), eta_old(n, fill::none), beta_old(k, fill::none),
       nu_old = vec(n, fill::zeros);
-  mat H(p, p);
+  mat H(p, p, fill::none);
+  double dev = dev_resids_(y, mu, theta, wt, family_type),
+         null_dev = dev_resids_(y, ymean, theta, wt, family_type), dev_old,
+         dev_ratio, dev_ratio_inner, rho;
+  bool dev_crit, val_crit, imp_crit, conv = false;
 
   // Maximize the log-likelihood
   for (iter = 0; iter < iter_max; ++iter) {
@@ -361,11 +362,6 @@ vec variance_(const vec &mu, const double &theta,
   if (!conv) {
     stop("Algorithm did not converge.");
   }
-
-  // Update weights and dependent variable
-
-  mu_eta = mu_eta_(eta, family_type);
-  w = (wt % square(mu_eta)) / variance_(mu, theta, family_type);
 
   // Compute Hessian
 

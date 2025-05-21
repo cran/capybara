@@ -120,7 +120,7 @@ temp_var_ <- function(data) {
 }
 
 #' @title Check formula
-#' @description Checks if formula for GLM/NegBin models
+#' @description Checks formulas for LM/GLM/NegBin models
 #' @param formula Formula object
 #' @noRd
 check_formula_ <- function(formula) {
@@ -129,6 +129,19 @@ check_formula_ <- function(formula) {
   } else if (!inherits(formula, "formula")) {
     stop("'formula' has to be of class 'formula'.", call. = FALSE)
   }
+
+  formula <- Formula(formula)
+
+  if (!any(grepl("\\|", formula[[3L]]))) {
+    message(
+      paste(
+        "Perhaps you forgot to add the fixed effects like 'mpg ~ wt | cyl'",
+        "You are better off using the 'lm()' function from base R."
+      )
+    )
+  }
+
+  assign("formula", formula, envir = parent.frame())
 }
 
 #' @title Check data
@@ -144,17 +157,49 @@ check_data_ <- function(data) {
 }
 
 #' @title Check control
-#' @description Checks control for GLM/NegBin models
+#' @description Checks control for GLM/NegBin models and merges with defaults
 #' @param control Control list
 #' @noRd
 check_control_ <- function(control) {
+  default_control <- do.call(feglm_control, list())
+
   if (is.null(control)) {
-    control <- list()
+    assign("control", default_control, envir = parent.frame())
   } else if (!inherits(control, "list")) {
     stop("'control' has to be a list.", call. = FALSE)
-  }
+  } else {
+    # merge user-provided values with defaults
+    merged_control <- default_control
 
-  do.call(feglm_control, control)
+    for (param_name in names(control)) {
+      if (param_name %in% names(default_control)) {
+        merged_control[[param_name]] <- control[[param_name]]
+      } else {
+        warning(sprintf("Unknown control parameter: '%s'", param_name), call. = FALSE)
+      }
+    }
+
+    # checks
+    # 1. non-negative params
+    non_neg_params <- c(
+      "dev_tol", "center_tol", "iter_max", "iter_center_max",
+      "iter_inner_max", "iter_interrupt", "iter_ssr", "limit"
+    )
+    for (param_name in non_neg_params) {
+      if (merged_control[[param_name]] <= 0) {
+        stop(sprintf("'%s' must be greater than zero.", param_name), call. = FALSE)
+      }
+    }
+    # 2. logical params
+    logical_params <- c("trace", "drop_pc", "keep_mx")
+    for (param_name in logical_params) {
+      if (!is.logical(merged_control[[param_name]])) {
+        stop(sprintf("'%s' must be logical.", param_name), call. = FALSE)
+      }
+    }
+
+    assign("control", merged_control, envir = parent.frame())
+  }
 }
 
 #' @title Check family
@@ -179,23 +224,6 @@ check_family_ <- function(family) {
   }
 }
 
-#' @title Update formula
-#' @description Updates formula for GLM/NegBin models
-#' @param formula Formula object
-#' @noRd
-update_formula_ <- function(formula) {
-  formula <- Formula(formula)
-
-  if (length(formula)[[2L]] < 2L || length(formula)[[1L]] > 1L) {
-    stop(paste(
-      "'formula' incorrectly specified. Perhaps you forgot to add the",
-      "fixed effects as 'mpg ~ wt | cyl' or similar."
-    ), call. = FALSE)
-  }
-
-  formula
-}
-
 #' @title Column types
 #' @description Returns the column types of a data frame
 #' @param data Data frame
@@ -212,13 +240,37 @@ col_types <- function(data) {
 #' @noRd
 model_frame_ <- function(data, formula, weights) {
   # Necessary columns
-  needed_cols <- c(all.vars(formula), weights)
+  formula_vars <- all.vars(formula)
+
+  # Handle different ways weights might be specified
+  if (is.null(weights)) {
+    # No weights specified
+    weight_col <- NULL
+    needed_cols <- formula_vars
+  } else if (is.character(weights) && length(weights) == 1) {
+    # Weights as column name
+    weight_col <- weights
+    needed_cols <- c(formula_vars, weight_col)
+  } else if (inherits(weights, "formula")) {
+    # Weights as formula like ~cyl
+    weight_col <- all.vars(weights)
+    needed_cols <- c(formula_vars, weight_col)
+    # Store the extracted column name for later use
+    assign("weights_col", weight_col, envir = parent.frame())
+  } else if (is.numeric(weights)) {
+    # Weights as vector - store for later use
+    weight_col <- NULL
+    needed_cols <- formula_vars
+    assign("weights_vec", weights, envir = parent.frame())
+  } else {
+    stop("'weights' must be a column name, formula, or numeric vector", call. = FALSE)
+  }
+
+  # Extract needed columns
   data <- data[, .SD, .SDcols = needed_cols]
 
   lhs <- names(data)[1L]
-
   nobs_full <- nrow(data)
-
   data <- na.omit(data)
 
   # Convert columns of type "units" to numeric
@@ -283,7 +335,7 @@ check_response_ <- function(data, lhs, family) {
 #' @param control Control list
 #' @noRd
 drop_by_link_type_ <- function(data, lhs, family, tmp_var, k_vars, control) {
-  if (family[["family"]] %in% c("binomial", "poisson") && control[["drop_pc"]]) {
+  if (family[["family"]] %in% c("binomial", "poisson") && isTRUE(control[["drop_pc"]])) {
     # Convert response to numeric if it's an integer
     if (is.integer(data[[lhs]])) {
       data[, (lhs) := as.numeric(get(lhs))]
@@ -365,13 +417,20 @@ model_response_ <- function(data, formula) {
 
 #' @title Check weights
 #' @description Checks if weights are valid
-#' @param x Regressor matrix
+#' @param y Dependent variable
+#' @param x Regressors matrix
 #' @param p Number of parameters
 #' @noRd
-check_linear_dependence_ <- function(x, p) {
-  if (qr(x)$rank < p) {
+check_linear_dependence_ <- function(y, x, p) {
+  # if (qr(x)$rank < p) {
+  #   stop("Linear dependent terms detected.", call. = FALSE)
+  # }
+
+  if (check_linear_dependence_qr_(y, x, p) == 1L) {
     stop("Linear dependent terms detected.", call. = FALSE)
   }
+
+  return(TRUE)
 }
 
 #' @title Check weights

@@ -1,3 +1,31 @@
+# capybara 1.0.0
+
+* Implements a new approach to obtain the rank with a QR decomposition without
+  loss of stability.
+* Adds different refactors to:
+  * Streamline the code
+  * Pass all large objects by reference
+  * Use BLAS/LAPACK instead of iteration for some operations
+* Uses a new configure file that works nicely with Intel MKL (i.e. the
+  user does not need to export environment variables for the package to
+  detect MKL).
+
+# capybara 0.9.6
+
+* Calculates the rank of matrix X based on singular value decomposition instead
+  of QR decomposition. This is more efficient and numerically stable.
+
+# capybara 0.9.5
+
+* Fixes and expands the 'weights' argument in the `fe*()` functions to allow for
+  different types of weights. The default is still `NULL` (i.e., all weights
+  equal to 1). The argument now admits weights passed as `weights = ~cyl`,
+  `weights = mtcars$cyl`, or `w <- mtcars$cyl; weights = w`.
+
+# capybara 0.9.4
+
+* Allows to estimate models without fixed effects.
+
 # capybara 0.9.3
 
 * Fixes the `tidy()` method for linear models (`felm` class). Now it does not

@@ -6,10 +6,9 @@
                                    const list &k_list) {
   // Type conversion
 
-  vec y = as_Col(y_r);
   mat X = as_Mat(x_r);
-  vec MNU = vec(y.n_elem, fill::zeros);
-  vec w = as_Col(wt_r);
+  const vec y = as_Col(y_r);
+  const vec w = as_Col(wt_r);
 
   // Auxiliary variables (fixed)
 
@@ -20,22 +19,37 @@
 
   // Auxiliary variables (storage)
 
-  mat MX, H;
+  mat H(X.n_cols, X.n_cols, fill::none);
+  vec MNU(y.n_elem, fill::none), beta(X.n_cols, fill::none),
+      fitted(y.n_elem, fill::none);
 
   // Center variables
 
-  MNU += y;
-  center_variables_(MNU, w, k_list, center_tol, iter_center_max,
-                    iter_interrupt, iter_ssr);
-  center_variables_(X, w, k_list, center_tol, iter_center_max, iter_interrupt, iter_ssr);
+  const bool has_fixed_effects = k_list.size() > 0;
+
+  if (has_fixed_effects) {
+    // Initial response + centering for fixed effects
+    MNU = y;
+    center_variables_(MNU, w, k_list, center_tol, iter_center_max,
+                      iter_interrupt, iter_ssr);
+    center_variables_(X, w, k_list, center_tol, iter_center_max, iter_interrupt,
+                      iter_ssr);
+  } else {
+    // No fixed effects
+    MNU = vec(y.n_elem, fill::zeros);
+  }
 
   // Solve the normal equations
 
-  vec beta = solve_beta_(X, MNU, w);
+  beta = solve_beta_(X, MNU, w);
 
   // Fitted values
 
-  vec fitted = y - MNU + X * beta;
+  if (has_fixed_effects) {
+    fitted = y - MNU + X * beta;
+  } else {
+    fitted = X * beta;
+  }
 
   // Recompute Hessian
 

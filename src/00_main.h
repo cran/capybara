@@ -1,11 +1,25 @@
+#pragma once
+
 #include <armadillo.hpp>
+#include <cmath>
 #include <cpp11.hpp>
 #include <cpp11armadillo.hpp>
+#include <limits>
 #include <regex>
 #include <unordered_map>
 
-using namespace arma;
-using namespace cpp11;
+// using namespace arma;
+using arma::field;
+using arma::mat;
+using arma::uvec;
+using arma::uword;
+using arma::vec;
+
+// using namespace cpp11;
+using cpp11::doubles;
+using cpp11::doubles_matrix;
+using cpp11::integers;
+using cpp11::list;
 
 // used across the scripts
 
@@ -13,7 +27,7 @@ void center_variables_(mat &V, const vec &w, const list &klist,
                        const double &tol, const int &max_iter,
                        const int &iter_interrupt, const int &iter_ssr);
 
-vec solve_beta_(mat MX, const mat &MNU, const vec &w);
+vec solve_beta_(mat &MX, const mat &MNU, const vec &w);
 
 vec solve_eta_(const mat &MX, const mat &MNU, const vec &nu, const vec &beta);
 

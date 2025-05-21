@@ -123,9 +123,6 @@ fenegbin <- function(
   # Check validity of control + Extract control list ----
   control <- check_control_(control)
 
-  # Update formula and do further validity check ----
-  formula <- update_formula_(formula)
-
   # Generate model.frame
   lhs <- nobs_na <- nobs_full <- NA
   model_frame_(data, formula, weights)
@@ -158,7 +155,7 @@ fenegbin <- function(
   model_response_(data, formula)
 
   # Check for linear dependence in 'x' ----
-  check_linear_dependence_(cbind(y, x), p + 1L)
+  check_linear_dependence_(y, x, p + 1L)
 
   # Extract weights if required ----
   if (is.null(weights)) {

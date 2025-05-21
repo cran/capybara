@@ -159,22 +159,26 @@ feglm <- function(
   check_family_(family)
 
   # Check validity of control + Extract control list ----
-  control <- check_control_(control)
-
-  # Update formula and do further validity check ----
-  formula <- update_formula_(formula)
+  check_control_(control)
 
   # Generate model.frame
   lhs <- NA # just to avoid global variable warning
   nobs_na <- NA
   nobs_full <- NA
+  weights_vec <- NA
+  weights_col <- NA
   model_frame_(data, formula, weights)
 
   # Ensure that model response is in line with the chosen model ----
   check_response_(data, lhs, family)
 
   # Get names of the fixed effects variables and sort ----
-  k_vars <- attr(terms(formula, rhs = 2L), "term.labels")
+  # the no FEs warning is printed in the check_formula_ function
+  k_vars <- suppressWarnings(attr(terms(formula, rhs = 2L), "term.labels"))
+  if (length(k_vars) <1L) {
+    k_vars <- "missing_fe"
+    data[, `:=`("missing_fe", 1L)]
+  }
 
   # Generate temporary variable ----
   tmp_var <- temp_var_(data)
@@ -195,13 +199,22 @@ feglm <- function(
   model_response_(data, formula)
 
   # Check for linear dependence ----
-  # check_linear_dependence_(x, p)
-  check_linear_dependence_(cbind(y, x), p + 1L)
+  check_linear_dependence_(y, x, p + 1L)
 
   # Extract weights if required ----
   if (is.null(weights)) {
     wt <- rep(1.0, nt)
+  } else if (!all(is.na(weights_vec))) {
+    # Weights provided as vector
+    wt <- weights_vec
+    if (length(wt) != nrow(data)) {
+      stop("Length of weights vector must equal number of observations.", call. = FALSE)
+    }
+  } else if (!all(is.na(weights_col))) {
+    # Weights provided as formula - use the extracted column name
+    wt <- data[[weights_col]]
   } else {
+    # Weights provided as column name
     wt <- data[[weights]]
   }
 
@@ -213,15 +226,24 @@ feglm <- function(
 
   # Get names and number of levels in each fixed effects category ----
   nms_fe <- lapply(data[, .SD, .SDcols = k_vars], levels)
-  lvls_k <- vapply(nms_fe, length, integer(1))
+  if (length(nms_fe) > 0L) {
+    lvls_k <- vapply(nms_fe, length, integer(1))
+  } else {
+    lvls_k <- c("missing_fe" = 1L)
+  }
 
   # Generate auxiliary list of indexes for different sub panels ----
-  k_list <- get_index_list_(k_vars, data)
+  if (!any(lvls_k %in% "missing_fe")) {
+    k_list <- get_index_list_(k_vars, data)
+  } else {
+    k_list <- list(list(`1` = seq_len(nt) - 1L))
+  }
 
   # Fit generalized linear model ----
   if (is.integer(y)) {
     y <- as.numeric(y)
   }
+
   fit <- feglm_fit_(
     beta, eta, y, x, wt, 0.0, family[["family"]], control, k_list
   )
