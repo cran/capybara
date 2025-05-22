@@ -2,7 +2,7 @@ Package: capybara
 Type: Package
 Title: Fast and Memory Efficient Fitting of Linear Models with
         High-Dimensional Fixed Effects
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: c(
     person(
         given = "Mauricio",
@@ -35,10 +35,11 @@ NeedsCompilation: yes
 LinkingTo: cpp11, cpp11armadillo
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-Packaged: 2025-05-21 01:54:08 UTC; pacha
+Remotes: ropenscilabs/srr
+Packaged: 2025-05-21 21:58:05 UTC; pacha
 Author: Mauricio Vargas Sepulveda [aut, cre] (ORCID:
     <https://orcid.org/0000-0003-1017-7574>),
   Yoto Yotov [ctb]
 Maintainer: Mauricio Vargas Sepulveda <m.sepulveda@mail.utoronto.ca>
 Repository: CRAN
-Date/Publication: 2025-05-21 02:30:02 UTC
+Date/Publication: 2025-05-22 04:50:06 UTC
