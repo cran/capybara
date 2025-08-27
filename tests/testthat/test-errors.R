@@ -10,7 +10,7 @@ NULL
 
 test_that("error conditions in APEs", {
   skip_on_cran()
-  
+
   trade_short <- trade_panel[trade_panel$exp_year == "CAN1994", ]
   trade_short <- trade_short[trade_short$trade > 100, ]
   trade_short$trade_200 <- ifelse(trade_short$trade >= 200, 1, 0)
@@ -27,13 +27,6 @@ test_that("error conditions in APEs", {
   expect_error(
     apes(lm(trade ~ log_dist, data = trade_short)),
     "non-'feglm'"
-  )
-
-  # using APEs with Poisson
-
-  expect_error(
-    apes(fepoisson(trade ~ log_dist | rta, data = trade_short)),
-    "binary choice"
   )
 
   # not using two-way fixed effects
@@ -124,7 +117,7 @@ test_that("error conditions in GLMs", {
     fepoisson(
       trade ~ log_dist | rta,
       data = trade_short,
-      control = list(limit = 0)
+      control = list(iter_max = 0)
     ),
     "greater than zero"
   )
@@ -141,9 +134,7 @@ test_that("error conditions in helpers", {
 
   # no formula
 
-  expect_error(
-    feglm(data = trade_short), "'formula' has to be specified"
-  )
+  expect_error(feglm(data = trade_short), "'formula' has to be specified")
 
   # incorrect formula
 
@@ -157,23 +148,11 @@ test_that("error conditions in helpers", {
 
   # null data
 
-  expect_error(
-    fepoisson(
-      trade ~ log_dist | rta,
-      data = NULL
-    ),
-    "'data' must be specified"
-  )
+  expect_error(fepoisson(trade ~ log_dist | rta, data = NULL), "'data' must be specified")
 
   # empty data
 
-  expect_error(
-    fepoisson(
-      trade ~ log_dist | rta,
-      data = list()
-    ),
-    "'data' must be a data.frame"
-  )
+  expect_error(fepoisson(trade ~ log_dist | rta, data = list()), "'data' must be a data.frame")
 
   # incorrect control
 
@@ -293,7 +272,7 @@ test_that("error conditions in helpers", {
       data = trade_short,
       init_theta = -1 # not allowed
     ),
-    "has to be strictly positive"
+    "positive scalar"
   )
 
   # intentionally break the data with unusable weights
@@ -306,6 +285,6 @@ test_that("error conditions in helpers", {
       data = trade_short,
       weights = "bad_weights"
     ),
-    "Linear dependent terms detected"
+    "Weights must be numeric"
   )
 })

@@ -8,18 +8,16 @@ NULL
 
 test_that("fenegbin is similar to fixest", {
   skip_on_cran()
-  
+
   mod <- fenegbin(mpg ~ wt | cyl, mtcars)
+  # fepoisson(mpg ~ wt | cyl, mtcars)
 
-  mod_base <- glm(
+  # MASS::glm.nb for negative binomial will return warning because of
+  # lack of overdispersion
+  mod_mass <- suppressWarnings(MASS::glm.nb(
     mpg ~ wt + as.factor(cyl),
-    mtcars,
-    family = quasipoisson(link = "log")
-  )
+    mtcars
+  ))
 
-  coef_dist_base <- coef(mod_base)[2]
-
-  dist_variation <- abs((coef(mod)[1] - coef_dist_base) / coef(mod)[1])
-
-  expect_lt(dist_variation, 0.05)
+  expect_equal(coef(mod)[1], coef(mod_mass)[2], tolerance = 0.05)
 })

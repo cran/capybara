@@ -18,10 +18,10 @@ fenegbin(
 }
 \arguments{
 \item{formula}{an object of class \code{"formula"}: a symbolic description of
-the model to be fitted. \code{formula} must be of type \code{y ~ x | k},
+the model to be fitted. \code{formula} must be of type \code{y ~ X | k},
 where the second part of the formula refers to factors to be concentrated
 out. It is also possible to pass clustering variables to \code{\link{feglm}}
-as \code{y ~ x | k | c}.}
+as \code{y ~ X | k | c}.}
 
 \item{data}{an object of class \code{"data.frame"} containing the variables
 in the model. The expected input is a dataset with the variables specified
@@ -45,7 +45,7 @@ predictor.}
 \code{"identity"}.}
 
 \item{control}{a named list of parameters for controlling the fitting
-process. See \code{\link{feglm_control}} for details.}
+process. See \code{\link{fit_control}} for details.}
 }
 \value{
 A named list of class \code{"feglm"}. The list contains the following
@@ -59,11 +59,11 @@ eighteen elements:
 \item{conv}{a logical indicating whether the model converged}
 \item{iter}{the number of iterations needed to converge}
 \item{theta}{the estimated theta parameter}
-\item{iter.outer}{the number of outer iterations}
-\item{conv.outer}{a logical indicating whether the outer loop converged}
+\item{iter_outer}{the number of outer iterations}
+\item{conv_outer}{a logical indicating whether the outer loop converged}
 \item{nobs}{a named vector with the number of observations used in the
 estimation indicating the dropped and perfectly predicted observations}
-\item{lvls_k}{a named vector with the number of levels in each fixed
+\item{fe_levels}{a named vector with the number of levels in each fixed
 effects}
 \item{nms_fe}{a list with the names of the fixed effects variables}
 \item{formula}{the formula used in the model}

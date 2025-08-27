@@ -35,21 +35,28 @@ predict.feglm <- function(object, newdata = NULL, type = c("link", "response"), 
     k_vars <- attr(terms(object$formula, rhs = 2L), "term.labels")
     data <- transform_fe_(data, object$formula, k_vars)
 
-    x <- NA
+    X <- NA
     nms_sp <- NA
     p <- NA
     model_response_(data, object$formula)
 
-    fes <- fixed_effects(object)
+    fes <- object[["fixed_effects"]]
     fes2 <- list()
 
     for (name in names(fes)) {
-      # # match the FE rownames and replace each level in the data with the FE
       fe <- fes[[name]]
-      fes2[[name]] <- fe[match(data[[name]], rownames(fe)), ]
+
+      fe_values <- fe
+      fe_names <- names(fe_values)
+
+      # Match values and handle missing levels
+      data_values <- data[[name]]
+      matched_values <- fe_values[match(data_values, fe_names)]
+      matched_values[is.na(matched_values)] <- 0 # Set missing levels to 0
+      fes2[[name]] <- matched_values
     }
 
-    eta <- x %*% object$coefficients + Reduce("+", fes2)
+    eta <- X %*% object$coefficients + Reduce("+", fes2)
   } else {
     eta <- object[["eta"]]
   }
@@ -58,7 +65,11 @@ predict.feglm <- function(object, newdata = NULL, type = c("link", "response"), 
     eta <- object[["family"]][["linkinv"]](eta)
   }
 
-  as.numeric(eta)
+  # Convert to vector and assign names
+  eta <- as.vector(eta)
+  names(eta) <- seq_along(eta)
+
+  eta
 }
 
 #' @title Predict method for 'felm' objects
@@ -76,27 +87,42 @@ predict.felm <- function(object, newdata = NULL, type = c("response", "terms"), 
     nobs_na <- NA
     nobs_full <- NA
     model_frame_(newdata, object$formula, NULL)
-    k_vars <- attr(terms(object$formula, rhs = 2L), "term.labels")
-    data <- transform_fe_(data, object$formula, k_vars)
+    fe_names <- attr(terms(object$formula, rhs = 2L), "term.labels")
+    data <- transform_fe_(data, object$formula, fe_names)
 
-    x <- NA
+    X <- NA
     nms_sp <- NA
     p <- NA
     model_response_(data, object$formula)
 
-    fes <- fixed_effects(object)
+    fes <- object[["fixed_effects"]]
     fes2 <- list()
 
     for (name in names(fes)) {
-      # # match the FE rownames and replace each level in the data with the FE
       fe <- fes[[name]]
-      fes2[[name]] <- fe[match(data[[name]], rownames(fe)), ]
+
+      fe_values <- fe
+      fe_names <- names(fe_values)
+
+      # Match values and handle missing levels
+      data_values <- data[[name]]
+      matched_values <- fe_values[match(data_values, fe_names)]
+      matched_values[is.na(matched_values)] <- 0 # Set missing levels to 0
+      fes2[[name]] <- matched_values
     }
 
-    yhat <- x %*% object$coefficients + Reduce("+", fes2)
+    # Replace NA coefficients with 0 for prediction
+    coef0 <- object$coefficients
+    coef0[is.na(coef0)] <- 0
+
+    y <- X %*% coef0 + Reduce("+", fes2)
   } else {
-    yhat <- object[["fitted.values"]]
+    y <- object[["fitted_values"]]
   }
 
-  as.numeric(yhat)
+  # Ensure y is a vector and assign names
+  y <- as.vector(y)
+  names(y) <- seq_along(y)
+
+  y
 }

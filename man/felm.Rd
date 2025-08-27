@@ -8,10 +8,10 @@ felm(formula = NULL, data = NULL, weights = NULL, control = NULL)
 }
 \arguments{
 \item{formula}{an object of class \code{"formula"}: a symbolic description of
-the model to be fitted. \code{formula} must be of type \code{y ~ x | k},
+the model to be fitted. \code{formula} must be of type \code{y ~ X | k},
 where the second part of the formula refers to factors to be concentrated
 out. It is also possible to pass clustering variables to \code{\link{feglm}}
-as \code{y ~ x | k | c}.}
+as \code{y ~ X | k | c}.}
 
 \item{data}{an object of class \code{"data.frame"} containing the variables
 in the model. The expected input is a dataset with the variables specified
@@ -22,19 +22,19 @@ variables in the model.}
 variable in \code{data}.}
 
 \item{control}{a named list of parameters for controlling the fitting
-process. See \code{\link{feglm_control}} for details.}
+process. See \code{\link{fit_control}} for details.}
 }
 \value{
 A named list of class \code{"felm"}. The list contains the following
 eleven elements:
 \item{coefficients}{a named vector of the estimated coefficients}
-\item{fitted.values}{a vector of the estimated dependent variable}
+\item{fitted_values}{a vector of the estimated dependent variable}
 \item{weights}{a vector of the weights used in the estimation}
 \item{hessian}{a matrix with the numerical second derivatives}
 \item{null_deviance}{the null deviance of the model}
 \item{nobs}{a named vector with the number of observations used in the
 estimation indicating the dropped and perfectly predicted observations}
-\item{lvls_k}{a named vector with the number of levels in each fixed
+\item{fe_levels}{a named vector with the number of levels in each fixed
 effect}
 \item{nms_fe}{a list with the names of the fixed effects variables}
 \item{formula}{the formula used in the model}

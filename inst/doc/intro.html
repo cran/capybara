@@ -27,46 +27,32 @@ document.addEventListener('DOMContentLoaded', function(e) {
   }
 });
 </script>
-<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
-// v0.0.1
-// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
-
-document.addEventListener('DOMContentLoaded', function() {
-  const codeList = document.getElementsByClassName("sourceCode");
-  for (var i = 0; i < codeList.length; i++) {
-    var linkList = codeList[i].getElementsByTagName('a');
-    for (var j = 0; j < linkList.length; j++) {
-      if (linkList[j].innerHTML === "") {
-        linkList[j].setAttribute('aria-hidden', 'true');
-      }
-    }
-  }
-});
-</script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -78,55 +64,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -159,6 +144,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
 
 <style type="text/css">body {
 background-color: #fff;
@@ -352,89 +360,114 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Poisson Pseudo-Maximum Likelihood (PPML) Model with Cluster-Robust Standard Errors</h1>
+<h1 class="title toc-ignore">Poisson Pseudo-Maximum Likelihood (PPML)
+Model with Cluster-Robust Standard Errors</h1>
 
 
 
-<p>We will estimate a Poisson Pseudo-Maximum Likelihood (PPML) model using the data available in this package with the idea of replicating the PPML results from Table 3 in <span class="citation">Yotov et al. (2016)</span>.</p>
-<p>This requires to include exporter-time and importer-time fixed effects, and to cluster the standard errors by exporter-importer pairs.</p>
+<p>We will estimate a Poisson Pseudo-Maximum Likelihood (PPML) model
+using the data available in this package with the idea of replicating
+the PPML results from Table 3 in <span class="citation">Yotov et al.
+(2016)</span>.</p>
+<p>This requires to include exporter-time and importer-time fixed
+effects, and to cluster the standard errors by exporter-importer
+pairs.</p>
 <p>The PPML especification corresponds to: <span class="math display">\[\begin{align}
-X_{ij,t} =&amp; \:\exp\left[\beta_1 \log(DIST)_{i,j} + \beta_2 CNTG_{i,j} +\right.\\
-\text{ }&amp; \:\left.\beta_3 LANG_{i,j} + \beta_4 CLNY_{i,j} + \pi_{i,t} + \chi_{i,t}\right] \times \varepsilon_{ij,t}.
+X_{ij,t} =&amp; \:\exp\left[\beta_1 \log(DIST)_{i,j} + \beta_2
+CNTG_{i,j} +\right.\\
+\text{ }&amp; \:\left.\beta_3 LANG_{i,j} + \beta_4 CLNY_{i,j} +
+\pi_{i,t} + \chi_{i,t}\right] \times \varepsilon_{ij,t}.
 \end{align}\]</span></p>
-<p>We use <code>dplyr</code> to obtain the log of the distance. This model excludes domestic flows, therefore we need to subset the data also with <code>dplyr</code>.</p>
+<p>We use <code>dplyr</code> to obtain the log of the distance. This
+model excludes domestic flows, therefore we need to subset the data also
+with <code>dplyr</code>.</p>
 <p>Required packages:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(capybara)</span></code></pre></div>
-<p>We can use the <code>fepoisson()</code> function to obtain the estimated coefficients and we add the fixed effects as <code>| exp_year + imp_year</code> in the formula.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(capybara)</span></code></pre></div>
+<p>We can use the <code>fepoisson()</code> function to obtain the
+estimated coefficients and we add the fixed effects as
+<code>| exp_year + imp_year</code> in the formula.</p>
 <p>Model estimation:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>fit &lt;-<span class="st"> </span><span class="kw">fepoisson</span>(</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>  trade <span class="op">~</span><span class="st"> </span>log_dist <span class="op">+</span><span class="st"> </span>cntg <span class="op">+</span><span class="st"> </span>lang <span class="op">+</span><span class="st"> </span>clny <span class="op">+</span><span class="st"> </span>rta <span class="op">|</span><span class="st"> </span>exp_year <span class="op">+</span><span class="st"> </span>imp_year,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>  <span class="dt">data =</span> trade_panel</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="kw">summary</span>(fit)</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>Formula<span class="op">:</span><span class="st"> </span>trade <span class="op">~</span><span class="st"> </span>log_dist <span class="op">+</span><span class="st"> </span>cntg <span class="op">+</span><span class="st"> </span>lang <span class="op">+</span><span class="st"> </span>clny <span class="op">+</span><span class="st"> </span>rta <span class="op">|</span><span class="st"> </span>exp_year <span class="op">+</span><span class="st"> </span>imp_year</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>Family<span class="op">:</span><span class="st"> </span>Poisson</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>Estimates<span class="op">:</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="er">|</span><span class="st">          </span><span class="er">|</span><span class="st"> </span>Estimate <span class="op">|</span><span class="st"> </span>Std. Error <span class="op">|</span><span class="st"> </span>z value    <span class="op">|</span><span class="st"> </span><span class="kw">Pr</span>(<span class="op">&gt;</span><span class="er">|</span>z<span class="op">|</span>)   <span class="op">|</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="er">|</span><span class="op">----------</span><span class="er">|</span><span class="op">----------</span><span class="er">|</span><span class="op">------------</span><span class="er">|</span><span class="op">------------</span><span class="er">|</span><span class="op">------------</span><span class="er">|</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="er">|</span><span class="st"> </span>log_dist <span class="op">|</span><span class="st">  </span><span class="fl">-0.8216</span> <span class="op">|</span><span class="st">     </span><span class="fl">0.0004</span> <span class="op">|</span><span class="st"> </span><span class="fl">-2194.0448</span> <span class="op">|</span><span class="st"> </span><span class="fl">0.0000</span> <span class="op">**</span><span class="er">*</span><span class="st"> </span><span class="er">|</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="er">|</span><span class="st"> </span>cntg     <span class="op">|</span><span class="st">   </span><span class="fl">0.4155</span> <span class="op">|</span><span class="st">     </span><span class="fl">0.0009</span> <span class="op">|</span><span class="st">   </span><span class="fl">476.0613</span> <span class="op">|</span><span class="st"> </span><span class="fl">0.0000</span> <span class="op">**</span><span class="er">*</span><span class="st"> </span><span class="er">|</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="er">|</span><span class="st"> </span>lang     <span class="op">|</span><span class="st">   </span><span class="fl">0.2499</span> <span class="op">|</span><span class="st">     </span><span class="fl">0.0008</span> <span class="op">|</span><span class="st">   </span><span class="fl">296.8884</span> <span class="op">|</span><span class="st"> </span><span class="fl">0.0000</span> <span class="op">**</span><span class="er">*</span><span class="st"> </span><span class="er">|</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a><span class="er">|</span><span class="st"> </span>clny     <span class="op">|</span><span class="st">  </span><span class="fl">-0.2054</span> <span class="op">|</span><span class="st">     </span><span class="fl">0.0010</span> <span class="op">|</span><span class="st">  </span><span class="fl">-206.3476</span> <span class="op">|</span><span class="st"> </span><span class="fl">0.0000</span> <span class="op">**</span><span class="er">*</span><span class="st"> </span><span class="er">|</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a><span class="er">|</span><span class="st"> </span>rta      <span class="op">|</span><span class="st">   </span><span class="fl">0.1907</span> <span class="op">|</span><span class="st">     </span><span class="fl">0.0010</span> <span class="op">|</span><span class="st">   </span><span class="fl">191.0964</span> <span class="op">|</span><span class="st"> </span><span class="fl">0.0000</span> <span class="op">**</span><span class="er">*</span><span class="st"> </span><span class="er">|</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>Significance codes<span class="op">:</span><span class="st"> </span><span class="er">***</span><span class="st"> </span><span class="fl">99.9</span><span class="op">%; ** 99%</span>; <span class="op">*</span><span class="st"> </span><span class="dv">95</span><span class="op">%; . 90%</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>Pseudo R<span class="op">-</span>squared<span class="op">:</span><span class="st"> </span><span class="fl">0.587</span> </span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>Number of observations<span class="op">:</span><span class="st"> </span>Full <span class="dv">28152</span>; Missing <span class="dv">0</span>; Perfect classification <span class="dv">0</span> </span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a>Number of Fisher Scoring iterations<span class="op">:</span><span class="st"> </span><span class="dv">11</span></span></code></pre></div>
-<p>The coefficients are almost identical to those in Table 3 from <span class="citation">Yotov et al. (2016)</span> that were obtained with Stata. The difference is attributed to the different fitting algorithms used by the software. Capybara uses the demeaning algorithm proposed by <span class="citation">Stammann (2018)</span>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>fit &lt;-<span class="st"> </span><span class="kw">fepoisson</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>  trade <span class="op">~</span><span class="st"> </span>log_dist <span class="op">+</span><span class="st"> </span>cntg <span class="op">+</span><span class="st"> </span>lang <span class="op">+</span><span class="st"> </span>clny <span class="op">+</span><span class="st"> </span>rta <span class="op">|</span><span class="st"> </span>exp_year <span class="op">+</span><span class="st"> </span>imp_year <span class="op">|</span><span class="st"> </span>pair,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>  <span class="dt">data =</span> trade_panel</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="kw">summary</span>(fit, <span class="dt">type =</span> <span class="st">&quot;clustered&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>Formula<span class="op">:</span><span class="st"> </span>trade <span class="op">~</span><span class="st"> </span>log_dist <span class="op">+</span><span class="st"> </span>cntg <span class="op">+</span><span class="st"> </span>lang <span class="op">+</span><span class="st"> </span>clny <span class="op">+</span><span class="st"> </span>rta <span class="op">|</span><span class="st"> </span>exp_year <span class="op">+</span><span class="st"> </span>imp_year <span class="op">|</span><span class="st"> </span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="st">    </span>pair</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>Family<span class="op">:</span><span class="st"> </span>Poisson</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>Estimates<span class="op">:</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="er">|</span><span class="st">          </span><span class="er">|</span><span class="st"> </span>Estimate <span class="op">|</span><span class="st"> </span>Std. Error <span class="op">|</span><span class="st"> </span>z value <span class="op">|</span><span class="st"> </span><span class="kw">Pr</span>(<span class="op">&gt;</span><span class="er">|</span>z<span class="op">|</span>)   <span class="op">|</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="er">|</span><span class="op">----------</span><span class="er">|</span><span class="op">----------</span><span class="er">|</span><span class="op">------------</span><span class="er">|</span><span class="op">---------</span><span class="er">|</span><span class="op">------------</span><span class="er">|</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a><span class="er">|</span><span class="st"> </span>log_dist <span class="op">|</span><span class="st">  </span><span class="fl">-0.8216</span> <span class="op">|</span><span class="st">     </span><span class="fl">0.1567</span> <span class="op">|</span><span class="st"> </span><span class="fl">-5.2437</span> <span class="op">|</span><span class="st"> </span><span class="fl">0.0000</span> <span class="op">**</span><span class="er">*</span><span class="st"> </span><span class="er">|</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a><span class="er">|</span><span class="st"> </span>cntg     <span class="op">|</span><span class="st">   </span><span class="fl">0.4155</span> <span class="op">|</span><span class="st">     </span><span class="fl">0.4568</span> <span class="op">|</span><span class="st">  </span><span class="fl">0.9097</span> <span class="op">|</span><span class="st"> </span><span class="fl">0.3630</span>     <span class="op">|</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a><span class="er">|</span><span class="st"> </span>lang     <span class="op">|</span><span class="st">   </span><span class="fl">0.2499</span> <span class="op">|</span><span class="st">     </span><span class="fl">0.3997</span> <span class="op">|</span><span class="st">  </span><span class="fl">0.6252</span> <span class="op">|</span><span class="st"> </span><span class="fl">0.5319</span>     <span class="op">|</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a><span class="er">|</span><span class="st"> </span>clny     <span class="op">|</span><span class="st">  </span><span class="fl">-0.2054</span> <span class="op">|</span><span class="st">     </span><span class="fl">0.3287</span> <span class="op">|</span><span class="st"> </span><span class="fl">-0.6250</span> <span class="op">|</span><span class="st"> </span><span class="fl">0.5320</span>     <span class="op">|</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a><span class="er">|</span><span class="st"> </span>rta      <span class="op">|</span><span class="st">   </span><span class="fl">0.1907</span> <span class="op">|</span><span class="st">     </span><span class="fl">0.7657</span> <span class="op">|</span><span class="st">  </span><span class="fl">0.2491</span> <span class="op">|</span><span class="st"> </span><span class="fl">0.8033</span>     <span class="op">|</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a>Significance codes<span class="op">:</span><span class="st"> </span><span class="er">***</span><span class="st"> </span><span class="fl">99.9</span><span class="op">%; ** 99%</span>; <span class="op">*</span><span class="st"> </span><span class="dv">95</span><span class="op">%; . 90%</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a>Pseudo R<span class="op">-</span>squared<span class="op">:</span><span class="st"> </span><span class="fl">0.587</span> </span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a>Number of observations<span class="op">:</span><span class="st"> </span>Full <span class="dv">28152</span>; Missing <span class="dv">0</span>; Perfect classification <span class="dv">0</span> </span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a>Number of Fisher Scoring iterations<span class="op">:</span><span class="st"> </span><span class="dv">11</span></span></code></pre></div>
-<p>The result is similar and the numerical difference comes fom the variance-covariance matrix estimation method. Capybara clustering algorithm is based on <span class="citation">Cameron, Gelbach, and Miller (2011)</span>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">fepoisson</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  trade <span class="sc">~</span> log_dist <span class="sc">+</span> cntg <span class="sc">+</span> lang <span class="sc">+</span> clny <span class="sc">+</span> rta <span class="sc">|</span> exp_year <span class="sc">+</span> imp_year,</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">data =</span> trade_panel</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>Formula<span class="sc">:</span> trade <span class="sc">~</span> log_dist <span class="sc">+</span> cntg <span class="sc">+</span> lang <span class="sc">+</span> clny <span class="sc">+</span> rta <span class="sc">|</span> exp_year <span class="sc">+</span> imp_year</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>Family<span class="sc">:</span> Poisson</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>Estimates<span class="sc">:</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="er">|</span>          <span class="er">|</span> Estimate <span class="sc">|</span> Std. Error <span class="sc">|</span> z value    <span class="sc">|</span> <span class="fu">Pr</span>(<span class="sc">&gt;</span><span class="er">|</span>z<span class="sc">|</span>)   <span class="sc">|</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="er">|</span><span class="sc">----------</span><span class="er">|</span><span class="sc">----------</span><span class="er">|</span><span class="sc">------------</span><span class="er">|</span><span class="sc">------------</span><span class="er">|</span><span class="sc">------------</span><span class="er">|</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="er">|</span> log_dist <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.8216</span> <span class="sc">|</span>     <span class="fl">0.0004</span> <span class="sc">|</span> <span class="sc">-</span><span class="fl">2194.0448</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span><span class="er">*</span> <span class="er">|</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="er">|</span> cntg     <span class="sc">|</span>   <span class="fl">0.4155</span> <span class="sc">|</span>     <span class="fl">0.0009</span> <span class="sc">|</span>   <span class="fl">476.0613</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span><span class="er">*</span> <span class="er">|</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="er">|</span> lang     <span class="sc">|</span>   <span class="fl">0.2499</span> <span class="sc">|</span>     <span class="fl">0.0008</span> <span class="sc">|</span>   <span class="fl">296.8884</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span><span class="er">*</span> <span class="er">|</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="er">|</span> clny     <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.2054</span> <span class="sc">|</span>     <span class="fl">0.0010</span> <span class="sc">|</span>  <span class="sc">-</span><span class="fl">206.3476</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span><span class="er">*</span> <span class="er">|</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="er">|</span> rta      <span class="sc">|</span>   <span class="fl">0.1907</span> <span class="sc">|</span>     <span class="fl">0.0010</span> <span class="sc">|</span>   <span class="fl">191.0964</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span><span class="er">*</span> <span class="er">|</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>Significance codes<span class="sc">:</span> <span class="er">***</span> <span class="fl">99.9</span><span class="sc">%; ** 99%</span>; <span class="sc">*</span> <span class="dv">95</span><span class="sc">%; . 90%</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>Pseudo R<span class="sc">-</span>squared<span class="sc">:</span> <span class="fl">0.587</span> </span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>Number of observations<span class="sc">:</span> Full <span class="dv">28152</span>; Missing <span class="dv">0</span>; Perfect classification <span class="dv">0</span> </span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>Number of Fisher Scoring iterations<span class="sc">:</span> <span class="dv">11</span></span></code></pre></div>
+<p>The coefficients are almost identical to those in Table 3 from <span class="citation">Yotov et al. (2016)</span> that were obtained with
+Stata. The difference is attributed to the different fitting algorithms
+used by the software. Capybara uses the demeaning algorithm proposed by
+<span class="citation">Stammann (2018)</span>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">fepoisson</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  trade <span class="sc">~</span> log_dist <span class="sc">+</span> cntg <span class="sc">+</span> lang <span class="sc">+</span> clny <span class="sc">+</span> rta <span class="sc">|</span> exp_year <span class="sc">+</span> imp_year <span class="sc">|</span> pair,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">data =</span> trade_panel</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="fu">summary</span>(fit, <span class="at">type =</span> <span class="st">&quot;clustered&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>Formula<span class="sc">:</span> trade <span class="sc">~</span> log_dist <span class="sc">+</span> cntg <span class="sc">+</span> lang <span class="sc">+</span> clny <span class="sc">+</span> rta <span class="sc">|</span> exp_year <span class="sc">+</span> imp_year <span class="sc">|</span> </span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>    pair</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>Family<span class="sc">:</span> Poisson</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>Estimates<span class="sc">:</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="er">|</span>          <span class="er">|</span> Estimate <span class="sc">|</span> Std. Error <span class="sc">|</span> z value <span class="sc">|</span> <span class="fu">Pr</span>(<span class="sc">&gt;</span><span class="er">|</span>z<span class="sc">|</span>)   <span class="sc">|</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="er">|</span><span class="sc">----------</span><span class="er">|</span><span class="sc">----------</span><span class="er">|</span><span class="sc">------------</span><span class="er">|</span><span class="sc">---------</span><span class="er">|</span><span class="sc">------------</span><span class="er">|</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="er">|</span> log_dist <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.8216</span> <span class="sc">|</span>     <span class="fl">0.1567</span> <span class="sc">|</span> <span class="sc">-</span><span class="fl">5.2437</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span><span class="er">*</span> <span class="er">|</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="er">|</span> cntg     <span class="sc">|</span>   <span class="fl">0.4155</span> <span class="sc">|</span>     <span class="fl">0.4568</span> <span class="sc">|</span>  <span class="fl">0.9097</span> <span class="sc">|</span> <span class="fl">0.3630</span>     <span class="sc">|</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="er">|</span> lang     <span class="sc">|</span>   <span class="fl">0.2499</span> <span class="sc">|</span>     <span class="fl">0.3997</span> <span class="sc">|</span>  <span class="fl">0.6252</span> <span class="sc">|</span> <span class="fl">0.5319</span>     <span class="sc">|</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="er">|</span> clny     <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.2054</span> <span class="sc">|</span>     <span class="fl">0.3287</span> <span class="sc">|</span> <span class="sc">-</span><span class="fl">0.6250</span> <span class="sc">|</span> <span class="fl">0.5320</span>     <span class="sc">|</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="er">|</span> rta      <span class="sc">|</span>   <span class="fl">0.1907</span> <span class="sc">|</span>     <span class="fl">0.7657</span> <span class="sc">|</span>  <span class="fl">0.2491</span> <span class="sc">|</span> <span class="fl">0.8033</span>     <span class="sc">|</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>Significance codes<span class="sc">:</span> <span class="er">***</span> <span class="fl">99.9</span><span class="sc">%; ** 99%</span>; <span class="sc">*</span> <span class="dv">95</span><span class="sc">%; . 90%</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>Pseudo R<span class="sc">-</span>squared<span class="sc">:</span> <span class="fl">0.587</span> </span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>Number of observations<span class="sc">:</span> Full <span class="dv">28152</span>; Missing <span class="dv">0</span>; Perfect classification <span class="dv">0</span> </span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>Number of Fisher Scoring iterations<span class="sc">:</span> <span class="dv">11</span></span></code></pre></div>
+<p>The result is similar and the numerical difference comes fom the
+variance-covariance matrix estimation method. Capybara clustering
+algorithm is based on <span class="citation">Cameron, Gelbach, and
+Miller (2011)</span>.</p>
 <div id="references" class="section level1 unnumbered">
 <h1 class="unnumbered">References</h1>
-<div id="refs" class="references hanging-indent">
-<div id="ref-cameron2011robust">
-<p>Cameron, A Colin, Jonah B Gelbach, and Douglas L Miller. 2011. “Robust Inference with Multiway Clustering.” <em>Journal of Business &amp; Economic Statistics</em> 29 (2): 238–49.</p>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-cameron2011robust" class="csl-entry">
+Cameron, A Colin, Jonah B Gelbach, and Douglas L Miller. 2011.
+<span>“Robust Inference with Multiway Clustering.”</span> <em>Journal of
+Business &amp; Economic Statistics</em> 29 (2): 238–49.
 </div>
-<div id="ref-stammann2018fast">
-<p>Stammann, Amrei. 2018. “Fast and Feasible Estimation of Generalized Linear Models with High-Dimensional K-Way Fixed Effects.” arXiv. <a href="https://doi.org/10.48550/arXiv.1707.01815">https://doi.org/10.48550/arXiv.1707.01815</a>.</p>
+<div id="ref-stammann2018fast" class="csl-entry">
+Stammann, Amrei. 2018. <span>“Fast and <span>Feasible</span>
+<span>Estimation</span> of <span>Generalized</span> <span>Linear</span>
+<span>Models</span> with <span>High</span>-<span>Dimensional</span>
+k-Way <span>Fixed</span> <span>Effects</span>.”</span> arXiv. <a href="https://doi.org/10.48550/arXiv.1707.01815">https://doi.org/10.48550/arXiv.1707.01815</a>.
 </div>
-<div id="ref-yotov2016advanced">
-<p>Yotov, Yoto V, Roberta Piermartini, Mario Larch, and others. 2016. <em>An Advanced Guide to Trade Policy Analysis​: The Structural Gravity Model</em>. WTO iLibrary.</p>
+<div id="ref-yotov2016advanced" class="csl-entry">
+Yotov, Yoto V, Roberta Piermartini, Mario Larch, et al. 2016. <em>An
+Advanced Guide to Trade Policy Analysis​: The Structural Gravity
+Model</em>. WTO iLibrary.
 </div>
 </div>
 </div>

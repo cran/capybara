@@ -134,11 +134,11 @@ apes <- function(
   data <- object[["data"]]
   family <- object[["family"]]
   formula <- object[["formula"]]
-  lvls_k <- object[["lvls_k"]]
+  fe_levels <- object[["fe_levels"]]
   nt <- nrow(data)
   nt_full <- object[["nobs"]][["nobs_full"]]
-  k <- length(lvls_k)
-  k_vars <- names(lvls_k)
+  k <- length(fe_levels)
+  k_vars <- names(fe_levels)
   p <- length(beta)
 
   # Check if binary choice model
@@ -153,13 +153,13 @@ apes <- function(
 
   # Extract model response, regressor matrix, and weights
   y <- data[[1L]]
-  x <- model.matrix(formula, data, rhs = 1L)[, -1L, drop = FALSE]
-  nms_sp <- attr(x, "dimnames")[[2L]]
-  attr(x, "dimnames") <- NULL
+  X <- model.matrix(formula, data, rhs = 1L)[, -1L, drop = FALSE]
+  nms_sp <- attr(X, "dimnames")[[2L]]
+  attr(X, "dimnames") <- NULL
   wt <- object[["weights"]]
 
   # Determine which of the regressors are binary
-  binary <- apply(x, 2L, function(x) all(x %in% c(0.0, 1.0)))
+  binary <- apply(X, 2L, function(X) all(X %in% c(0.0, 1.0)))
 
   # Generate auxiliary list of indexes for different sub panels
   k_list <- get_index_list_(k_vars, data)
@@ -180,14 +180,28 @@ apes <- function(
   }
 
   # Center regressor matrix (if required)
-  if (control[["keep_mx"]]) {
-    mx <- object[["mx"]]
+  if (control[["keep_tx"]]) {
+    tx <- object[["tx"]]
   } else {
-    mx <- center_variables_r_(x, w, k_list, control[["center_tol"]], control[["iter_max"]], control[["iter_interrupt"]], control[["iter_ssr"]])
+    tx <- center_variables_(X, w, k_list, 
+                           control[["center_tol"]], 
+                           control[["iter_center_max"]], 
+                           control[["iter_interrupt"]], 
+                           control[["iter_ssr"]], 
+                           control[["accel_start"]], 
+                           control[["project_tol_factor"]], 
+                           control[["grand_accel_tol"]], 
+                           control[["project_group_tol"]], 
+                           control[["irons_tuck_tol"]], 
+                           control[["grand_accel_interval"]], 
+                           control[["irons_tuck_interval"]], 
+                           control[["ssr_check_interval"]], 
+                           control[["convergence_factor"]], 
+                           control[["tol_multiplier"]])
   }
 
   # Compute average partial effects, derivatives, and Jacobian
-  px <- x - mx
+  px <- X - tx
   delta <- matrix(NA_real_, nt, p)
   delta1 <- matrix(NA_real_, nt, p)
   j <- matrix(NA_real_, p, p)
@@ -197,20 +211,20 @@ apes <- function(
   }
   for (i in seq.int(p)) {
     if (binary[[i]]) {
-      eta0 <- eta - x[, i] * beta[[i]]
+      eta0 <- eta - X[, i] * beta[[i]]
       eta1 <- eta0 + beta[[i]]
       f1 <- family[["mu.eta"]](eta1)
       delta[, i] <- (family[["linkinv"]](eta1) - family[["linkinv"]](eta0))
       delta1[, i] <- f1 - family[["mu.eta"]](eta0)
       j[, i] <- -colSums(px * delta1[, i]) / nt_full
       j[i, i] <- sum(f1) / nt_full + j[i, i]
-      j[-i, i] <- colSums(x[, -i, drop = FALSE] * delta1[, i]) /
+      j[-i, i] <- colSums(X[, -i, drop = FALSE] * delta1[, i]) /
         nt_full + j[-i, i]
       rm(eta0, f1)
     } else {
       delta[, i] <- beta[[i]] * delta[, i]
       delta1[, i] <- beta[[i]] * delta1[, i]
-      j[, i] <- colSums(mx * delta1[, i]) / nt_full
+      j[, i] <- colSums(tx * delta1[, i]) / nt_full
       j[i, i] <- sum(mu_eta) / nt_full + j[i, i]
     }
   }
@@ -220,14 +234,28 @@ apes <- function(
 
   # Compute projection and residual projection of \psi
   psi <- -delta1 / w
-  mpsi <- center_variables_r_(psi, w, k_list, control[["center_tol"]], control[["iter_max"]], control[["iter_interrupt"]], control[["iter_ssr"]])
+  mpsi <- center_variables_(psi, w, k_list, 
+                           control[["center_tol"]], 
+                           control[["iter_max"]], 
+                           control[["iter_interrupt"]], 
+                           control[["iter_ssr"]], 
+                           control[["accel_start"]], 
+                           control[["project_tol_factor"]], 
+                           control[["grand_accel_tol"]], 
+                           control[["project_group_tol"]], 
+                           control[["irons_tuck_tol"]], 
+                           control[["grand_accel_interval"]], 
+                           control[["irons_tuck_interval"]], 
+                           control[["ssr_check_interval"]], 
+                           control[["convergence_factor"]], 
+                           control[["tol_multiplier"]])
   ppsi <- psi - mpsi
   rm(delta1, psi)
 
   # Compute analytical bias correction of average partial effects
   if (bias_corr) {
     b <- apes_bias_correction_(
-      eta, family, x, beta, binary, nt, p, ppsi, z,
+      eta, family, X, beta, binary, nt, p, ppsi, z,
       w, k_list, panel_structure, l, k, mpsi, v
     )
     delta_aux <- delta_aux - b
@@ -235,7 +263,7 @@ apes <- function(
   rm(eta, w, z, mpsi)
 
   # Compute covariance matrix
-  gamma <- gamma_(mx, object[["hessian"]], j, ppsi, v, nt_full)
+  gamma <- gamma_(tx, object[["hessian"]], j, ppsi, v, nt_full)
   v <- crossprod(gamma)
 
   v <- apes_adjust_covariance_(
@@ -343,14 +371,14 @@ apes_adjust_covariance_ <- function(
 NULL
 
 apes_bias_correction_ <- function(
-    eta, family, x, beta, binary, nt, p, ppsi,
+    eta, family, X, beta, binary, nt, p, ppsi,
     z, w, k_list, panel_structure, l, k, mpsi, v) {
   # Compute second-order partial derivatives
   delta2 <- matrix(NA_real_, nt, p)
   delta2[, !binary] <- partial_mu_eta_(eta, family, 3L)
   for (i in seq.int(p)) {
     if (binary[[i]]) {
-      eta0 <- eta - x[, i] * beta[[i]]
+      eta0 <- eta - X[, i] * beta[[i]]
       delta2[, i] <- partial_mu_eta_(eta0 + beta[[i]], family, 2L) -
         partial_mu_eta_(eta0, family, 2L)
       rm(eta0)

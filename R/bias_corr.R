@@ -90,11 +90,11 @@ bias_corr <- function(
   data <- object[["data"]]
   family <- object[["family"]]
   formula <- object[["formula"]]
-  lvls_k <- object[["lvls_k"]]
+  fe_levels <- object[["fe_levels"]]
   nms_sp <- names(beta_uncorr)
   nt <- object[["nobs"]][["nobs"]]
-  k_vars <- names(lvls_k)
-  k <- length(lvls_k)
+  k_vars <- names(fe_levels)
+  k <- length(fe_levels)
 
   # Check if binary choice model
   apes_bias_check_binary_model_(family, fun = "bias_corr")
@@ -107,8 +107,8 @@ bias_corr <- function(
 
   # Extract model response, regressor matrix, and weights
   y <- data[[1L]]
-  x <- model.matrix(formula, data, rhs = 1L)[, -1L, drop = FALSE]
-  attr(x, "dimnames") <- NULL
+  X <- model.matrix(formula, data, rhs = 1L)[, -1L, drop = FALSE]
+  attr(X, "dimnames") <- NULL
   wt <- object[["weights"]]
 
   # Generate auxiliary list of indexes for different sub panels
@@ -130,35 +130,54 @@ bias_corr <- function(
   }
 
   # Center regressor matrix (if required)
-  if (control[["keep_mx"]]) {
-    x <- object[["mx"]]
+  if (control[["keep_tx"]]) {
+    X <- object[["tx"]]
   } else {
-    x <- center_variables_r_(x, w, k_list, control[["center_tol"]], control[["iter_max"]], control[["iter_interrupt"]], control[["iter_ssr"]])
+    defaults <- fit_control()
+    get_param <- function(name) {
+      if (is.null(control[[name]])) defaults[[name]] else control[[name]]
+    }
+    
+    X <- center_variables_(X, w, k_list, 
+                          control[["center_tol"]], 
+                          control[["iter_max"]], 
+                          control[["iter_interrupt"]], 
+                          control[["iter_ssr"]], 
+                          control[["accel_start"]], 
+                          get_param("project_tol_factor"), 
+                          get_param("grand_accel_tol"), 
+                          get_param("project_group_tol"), 
+                          get_param("irons_tuck_tol"), 
+                          get_param("grand_accel_interval"), 
+                          get_param("irons_tuck_interval"), 
+                          get_param("ssr_check_interval"), 
+                          get_param("convergence_factor"), 
+                          get_param("tol_multiplier"))
   }
 
   # Compute bias terms for requested bias correction
   if (panel_structure == "classic") {
     # Compute \hat{B} and \hat{D}
-    b <- as.vector(group_sums_(x * z, w, k_list[[1L]])) / 2.0 / nt
+    b <- as.vector(group_sums_(X * z, w, k_list[[1L]])) / 2.0 / nt
     if (k > 1L) {
-      b <- b + as.vector(group_sums_(x * z, w, k_list[[2L]])) / 2.0 / nt
+      b <- b + as.vector(group_sums_(X * z, w, k_list[[2L]])) / 2.0 / nt
     }
 
     # Compute spectral density part of \hat{B}
     if (l > 0L) {
-      b <- (b + group_sums_spectral_(x * w, v, w, l, k_list[[1L]])) / nt
+      b <- (b + group_sums_spectral_(X * w, v, w, l, k_list[[1L]])) / nt
     }
   } else {
     # Compute \hat{D}_{1}, \hat{D}_{2}, and \hat{B}
-    b <- group_sums_(x * z, w, k_list[[1L]]) / (2.0 * nt)
-    b <- (b + group_sums_(x * z, w, k_list[[2L]])) / (2.0 * nt)
+    b <- group_sums_(X * z, w, k_list[[1L]]) / (2.0 * nt)
+    b <- (b + group_sums_(X * z, w, k_list[[2L]])) / (2.0 * nt)
     if (k > 2L) {
-      b <- (b + group_sums_(x * z, w, k_list[[3L]])) / (2.0 * nt)
+      b <- (b + group_sums_(X * z, w, k_list[[3L]])) / (2.0 * nt)
     }
 
     # Compute spectral density part of \hat{B}
     if (k > 2L && l > 0L) {
-      b <- (b + group_sums_spectral_(x * w, v, w, l, k_list[[3L]])) / nt
+      b <- (b + group_sums_spectral_(X * w, v, w, l, k_list[[3L]])) / nt
     }
   }
 
@@ -167,7 +186,7 @@ bias_corr <- function(
   names(beta) <- nms_sp
 
   # Update \eta and first- and second-order derivatives
-  eta <- feglm_offset_(object, x %*% beta)
+  eta <- feglm_offset_(object, X %*% beta)
   mu <- family[["linkinv"]](eta)
   mu_eta <- family[["mu.eta"]](eta)
   v <- wt * (y - mu)
@@ -180,17 +199,31 @@ bias_corr <- function(
   }
 
   # Update centered regressor matrix
-  x <- center_variables_r_(x, w, k_list, control[["center_tol"]], control[["iter_max"]], control[["iter_interrupt"]], control[["iter_ssr"]])
-  colnames(x) <- nms_sp
+  X <- center_variables_(X, w, k_list, 
+                        control[["center_tol"]], 
+                        control[["iter_max"]], 
+                        control[["iter_interrupt"]], 
+                        control[["iter_ssr"]], 
+                        control[["accel_start"]], 
+                        get_param("project_tol_factor"), 
+                        get_param("grand_accel_tol"), 
+                        get_param("project_group_tol"), 
+                        get_param("irons_tuck_tol"), 
+                        get_param("grand_accel_interval"), 
+                        get_param("irons_tuck_interval"), 
+                        get_param("ssr_check_interval"), 
+                        get_param("convergence_factor"), 
+                        get_param("tol_multiplier"))
+  colnames(X) <- nms_sp
 
   # Update hessian
-  h <- crossprod(x * sqrt(w))
+  h <- crossprod(X * sqrt(w))
   dimnames(h) <- list(nms_sp, nms_sp)
 
   # Update result list
   object[["coefficients"]] <- beta
   object[["eta"]] <- eta
-  if (control[["keep_mx"]]) object[["mx"]] <- x
+  if (control[["keep_tx"]]) object[["tx"]] <- X
   object[["hessian"]] <- h
   object[["coefficients_uncorr"]] <- beta_uncorr
   object[["bias_term"]] <- b
@@ -204,8 +237,8 @@ bias_corr <- function(
   object
 }
 
-bias_corr_check_fixed_effects_ <- function(lvls_k) {
-  if (length(lvls_k) > 3) {
+bias_corr_check_fixed_effects_ <- function(fe_levels) {
+  if (length(fe_levels) > 3) {
     stop(
       "bias_corr() only supports models with up to three-way fixed effects.",
       call. = FALSE

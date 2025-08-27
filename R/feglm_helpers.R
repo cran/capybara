@@ -33,13 +33,13 @@ NULL
 
 #' @title Transform factor
 #' @description Checks if variable is a factor and transforms if necessary
-#' @param x Variable to be checked
+#' @param X Variable to be checked
 #' @noRd
-check_factor_ <- function(x) {
-  if (is.factor(x)) {
-    droplevels(x)
+check_factor_ <- function(X) {
+  if (is.factor(X)) {
+    droplevels(X)
   } else {
-    factor(x)
+    factor(X)
   }
 }
 
@@ -161,7 +161,7 @@ check_data_ <- function(data) {
 #' @param control Control list
 #' @noRd
 check_control_ <- function(control) {
-  default_control <- do.call(feglm_control, list())
+  default_control <- do.call(fit_control, list())
 
   if (is.null(control)) {
     assign("control", default_control, envir = parent.frame())
@@ -191,7 +191,7 @@ check_control_ <- function(control) {
       }
     }
     # 2. logical params
-    logical_params <- c("trace", "drop_pc", "keep_mx")
+    logical_params <- c("trace", "drop_pc", "keep_tx")
     for (param_name in logical_params) {
       if (!is.logical(merged_control[[param_name]])) {
         stop(sprintf("'%s' must be logical.", param_name), call. = FALSE)
@@ -222,69 +222,6 @@ check_family_ <- function(family) {
       call. = FALSE
     )
   }
-}
-
-#' @title Column types
-#' @description Returns the column types of a data frame
-#' @param data Data frame
-#' @noRd
-col_types <- function(data) {
-  vapply(data, class, character(1L), USE.NAMES = FALSE)
-}
-
-#' @title Model frame
-#' @description Creates model frame for GLM/NegBin models
-#' @param data Data frame
-#' @param formula Formula object
-#' @param weights Weights
-#' @noRd
-model_frame_ <- function(data, formula, weights) {
-  # Necessary columns
-  formula_vars <- all.vars(formula)
-
-  # Handle different ways weights might be specified
-  if (is.null(weights)) {
-    # No weights specified
-    weight_col <- NULL
-    needed_cols <- formula_vars
-  } else if (is.character(weights) && length(weights) == 1) {
-    # Weights as column name
-    weight_col <- weights
-    needed_cols <- c(formula_vars, weight_col)
-  } else if (inherits(weights, "formula")) {
-    # Weights as formula like ~cyl
-    weight_col <- all.vars(weights)
-    needed_cols <- c(formula_vars, weight_col)
-    # Store the extracted column name for later use
-    assign("weights_col", weight_col, envir = parent.frame())
-  } else if (is.numeric(weights)) {
-    # Weights as vector - store for later use
-    weight_col <- NULL
-    needed_cols <- formula_vars
-    assign("weights_vec", weights, envir = parent.frame())
-  } else {
-    stop("'weights' must be a column name, formula, or numeric vector", call. = FALSE)
-  }
-
-  # Extract needed columns
-  data <- data[, .SD, .SDcols = needed_cols]
-
-  lhs <- names(data)[1L]
-  nobs_full <- nrow(data)
-  data <- na.omit(data)
-
-  # Convert columns of type "units" to numeric
-  unit_cols <- names(data)[vapply(data, inherits, what = "units", logical(1))]
-  if (length(unit_cols) > 0) {
-    data[, (unit_cols) := lapply(.SD, as.numeric), .SDcols = unit_cols]
-  }
-
-  nobs_na <- nobs_full - nrow(data)
-
-  assign("data", data, envir = parent.frame())
-  assign("lhs", lhs, envir = parent.frame())
-  assign("nobs_na", nobs_na, envir = parent.frame())
-  assign("nobs_full", nobs_full, envir = parent.frame())
 }
 
 #' @title Check response
@@ -367,70 +304,23 @@ drop_by_link_type_ <- function(data, lhs, family, tmp_var, k_vars, control) {
   data
 }
 
-#' @title Transform fixed effects
-#' @description Transforms fixed effects that are factors
-#' @param data Data frame
-#' @param formula Formula object
-#' @param k_vars Fixed effects
-#' @noRd
-transform_fe_ <- function(data, formula, k_vars) {
-  data[, (k_vars) := lapply(.SD, check_factor_), .SDcols = k_vars]
-
-  if (length(formula)[[2L]] > 2L) {
-    add_vars <- attr(terms(formula, rhs = 3L), "term.labels")
-    data[, (add_vars) := lapply(.SD, check_factor_), .SDcols = add_vars]
-  }
-
-  return(data)
-}
-
-#' @title Number of observations
-#' @description Computes the number of observations
-#' @param nobs_full Number of observations in the full data set
-#' @param nobs_na Number of observations with missing values
-#' @param nt Number of observations after dropping
-#' @noRd
-nobs_ <- function(nobs_full, nobs_na, nt) {
-  c(
-    nobs_full = nobs_full,
-    nobs_na   = nobs_na,
-    nobs_pc   = nobs_full - nt,
-    nobs      = nobs_full + nobs_na
-  )
-}
-
 #' @title Model response
 #' @description Computes the model response
 #' @param data Data frame
 #' @param formula Formula object
 #' @noRd
 model_response_ <- function(data, formula) {
-  x <- model.matrix(formula, data, rhs = 1L)[, -1L, drop = FALSE]
-  nms_sp <- colnames(x)
-  attr(x, "dimnames") <- NULL
+  # Evaluate the left-hand side of the formula in the context of data
+  mf <- model.frame(formula, data, na.action = na.pass)
+  y <- model.response(mf)
+  X <- model.matrix(formula, data, rhs = 1L)[, -1L, drop = FALSE]
+  nms_sp <- colnames(X)
+  attr(X, "dimnames") <- NULL
 
-  assign("y", data[[1L]], envir = parent.frame())
-  assign("x", x, envir = parent.frame())
+  assign("y", y, envir = parent.frame())
+  assign("X", X, envir = parent.frame())
   assign("nms_sp", nms_sp, envir = parent.frame())
-  assign("p", ncol(x), envir = parent.frame())
-}
-
-#' @title Check weights
-#' @description Checks if weights are valid
-#' @param y Dependent variable
-#' @param x Regressors matrix
-#' @param p Number of parameters
-#' @noRd
-check_linear_dependence_ <- function(y, x, p) {
-  # if (qr(x)$rank < p) {
-  #   stop("Linear dependent terms detected.", call. = FALSE)
-  # }
-
-  if (check_linear_dependence_qr_(y, x, p) == 1L) {
-    stop("Linear dependent terms detected.", call. = FALSE)
-  }
-
-  return(TRUE)
+  assign("p", ncol(X), envir = parent.frame())
 }
 
 #' @title Check weights
@@ -472,7 +362,7 @@ init_theta_ <- function(init_theta, link) {
 #' @param beta_start Starting values for beta
 #' @param eta_start Starting values for eta
 #' @param y Dependent variable
-#' @param x Regressor matrix
+#' @param X Regressor matrix
 #' @param beta Beta values
 #' @param nt Number of observations
 #' @param wt Weights
@@ -480,7 +370,7 @@ init_theta_ <- function(init_theta, link) {
 #' @param family Family object
 #' @noRd
 start_guesses_ <- function(
-    beta_start, eta_start, y, x, beta, nt, wt, p, family) {
+    beta_start, eta_start, y, X, beta, nt, wt, p, family) {
   if (!is.null(beta_start) || !is.null(eta_start)) {
     # If both are specified, ignore eta_start
     if (!is.null(beta_start) && !is.null(eta_start)) {
@@ -505,7 +395,7 @@ start_guesses_ <- function(
 
       # Set starting guesses
       beta <- beta_start
-      eta <- x %*% beta
+      eta <- X %*% beta
     } else {
       # Validity of input argument (eta_start)
       if (length(eta_start) != nt) {
@@ -538,19 +428,6 @@ start_guesses_ <- function(
   assign("eta", eta, envir = parent.frame())
 }
 
-#' @title Get index list
-#' @description Generates an auxiliary list of indexes to project out the fixed
-#'  effects
-#' @param k_vars Fixed effects
-#' @param data Data frame
-#' @noRd
-get_index_list_ <- function(k_vars, data) {
-  indexes <- seq.int(0L, nrow(data) - 1L)
-  lapply(k_vars, function(x, indexes, data) {
-    split(indexes, data[[x]])
-  }, indexes = indexes, data = data)
-}
-
 #' @title Get score matrix
 #' @description Computes the score matrix
 #' @param object Result list
@@ -571,8 +448,8 @@ get_score_matrix_feglm_ <- function(object) {
   nu <- (y - mu) / mu_eta
 
   # Center regressor matrix (if required)
-  if (control[["keep_mx"]]) {
-    mx <- object[["mx"]]
+  if (control[["keep_tx"]]) {
+    tx <- object[["tx"]]
   } else {
     # Extract additional required quantities from result list
     formula <- object[["formula"]]
@@ -582,29 +459,48 @@ get_score_matrix_feglm_ <- function(object) {
     k_list <- get_index_list_(k_vars, data)
 
     # Extract regressor matrix
-    x <- model.matrix(formula, data, rhs = 1L)[, -1L, drop = FALSE]
-    nms_sp <- attr(x, "dimnames")[[2L]]
-    attr(x, "dimnames") <- NULL
+    X <- model.matrix(formula, data, rhs = 1L)[, -1L, drop = FALSE]
+    nms_sp <- attr(X, "dimnames")[[2L]]
+    attr(X, "dimnames") <- NULL
 
     # Center variables
-    x <- center_variables_r_(x, w, k_list, control[["center_tol"]], control[["iter_max"]], control[["interrupt_iter"]], control[["iter_ssr"]])
-    colnames(x) <- nms_sp
+    defaults <- fit_control()
+    get_param <- function(name) {
+      if (is.null(control[[name]])) defaults[[name]] else control[[name]]
+    }
+    
+    X <- center_variables_(X, w, k_list, 
+                          control[["center_tol"]], 
+                          control[["iter_max"]], 
+                          control[["iter_interrupt"]], 
+                          control[["iter_ssr"]], 
+                          control[["accel_start"]], 
+                          get_param("project_tol_factor"), 
+                          get_param("grand_accel_tol"), 
+                          get_param("project_group_tol"), 
+                          get_param("irons_tuck_tol"), 
+                          get_param("grand_accel_interval"), 
+                          get_param("irons_tuck_interval"), 
+                          get_param("ssr_check_interval"), 
+                          get_param("convergence_factor"), 
+                          get_param("tol_multiplier"))
+    colnames(X) <- nms_sp
   }
 
   # Return score matrix
-  x * (nu * w)
+  X * (nu * w)
 }
 
 #' @title Gamma computation
 #' @description Computes the gamma matrix for the APES function
-#' @param mx Regressor matrix
+#' @param tx Regressor matrix
 #' @param h Hessian matrix
 #' @param j Jacobian matrix
 #' @param ppsi Psi matrix
 #' @param v Vector of weights
 #' @param nt Number of observations
 #' @noRd
-gamma_ <- function(mx, h, j, ppsi, v, nt) {
+gamma_ <- function(tx, h, j, ppsi, v, nt) {
   inv_nt <- 1.0 / nt
-  (mx %*% solve(h * inv_nt, j) - ppsi) * v * inv_nt
+  (tx %*% solve(h * inv_nt, j) - ppsi) * v * inv_nt
 }

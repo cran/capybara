@@ -17,8 +17,8 @@ get_score_matrix_felm_ <- function(object) {
   y <- data[[1L]]
 
   # Center regressor matrix (if required)
-  if (control[["keep_mx"]]) {
-    mx <- object[["mx"]]
+  if (control[["keep_tx"]]) {
+    tx <- object[["tx"]]
   } else {
     # Extract additional required quantities from result list
     formula <- object[["formula"]]
@@ -28,15 +28,34 @@ get_score_matrix_felm_ <- function(object) {
     k_list <- get_index_list_(k_vars, data)
 
     # Extract regressor matrix
-    x <- model.matrix(formula, data, rhs = 1L)[, -1L, drop = FALSE]
-    nms_sp <- attr(x, "dimnames")[[2L]]
-    attr(x, "dimnames") <- NULL
+    X <- model.matrix(formula, data, rhs = 1L)[, -1L, drop = FALSE]
+    nms_sp <- attr(X, "dimnames")[[2L]]
+    attr(X, "dimnames") <- NULL
 
     # Center variables
-    mx <- center_variables_r_(x, w, k_list, control[["center_tol"]], control[["iter_max"]], control[["iter_interrupt"]], control[["iter_ssr"]])
-    colnames(mx) <- nms_sp
+    defaults <- fit_control()
+    get_param <- function(name) {
+      if (is.null(control[[name]])) defaults[[name]] else control[[name]]
+    }
+    
+    tx <- center_variables_(X, w, k_list, 
+                           control[["center_tol"]], 
+                           control[["iter_max"]], 
+                           control[["iter_interrupt"]], 
+                           control[["iter_ssr"]], 
+                           control[["accel_start"]], 
+                           get_param("project_tol_factor"), 
+                           get_param("grand_accel_tol"), 
+                           get_param("project_group_tol"), 
+                           get_param("irons_tuck_tol"), 
+                           get_param("grand_accel_interval"), 
+                           get_param("irons_tuck_interval"), 
+                           get_param("ssr_check_interval"), 
+                           get_param("convergence_factor"), 
+                           get_param("tol_multiplier"))
+    colnames(tx) <- nms_sp
   }
 
   # Return score matrix
-  mx * (y * w)
+  tx * (y * w)
 }

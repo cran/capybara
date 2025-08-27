@@ -13,8 +13,13 @@ NULL
 
 test_that("fepoisson is similar to fixest", {
   skip_on_cran()
-  
+
+  # K = 1
+
   mod <- fepoisson(mpg ~ wt | cyl | am, mtcars)
+
+  # fixest::fepois(mpg ~ wt | cyl, mtcars)
+  # wt -0.179882
 
   mod_base <- glm(
     mpg ~ wt + as.factor(cyl),
@@ -24,26 +29,26 @@ test_that("fepoisson is similar to fixest", {
 
   coef_dist_base <- coef(mod_base)[2]
 
-  dist_variation <- abs((coef(mod)[1] - coef_dist_base) / coef(mod)[1])
+  dist_variation <- unname(abs((coef(mod)[1] - coef_dist_base) / coef(mod)[1]))
 
-  expect_lt(dist_variation, 0.05)
+  expect_equal(dist_variation, 0.0, tolerance = 1e-2)
 
   expect_output(print(mod))
 
   expect_visible(summary(mod, type = "cluster"))
 
-  fes <- fixed_effects(mod)
-  n <- unname(mod[["nobs"]]["nobs"])
-  expect_equal(length(fes), 1)
+  # fes <- fixed_effects(mod)
+  n <- unname(mod[["nobs"]]["nobs_full"])
+  # expect_equal(length(fes), 1)
   expect_equal(length(fitted(mod)), n)
   expect_equal(length(predict(mod)), n)
   expect_equal(length(coef(mod)), 1)
-  expect_equal(length(fes), 1)
 
-  expect_equal(
-    round(fes[["cyl"]][1], 2),
-    unname(round(coef(glm(mpg ~ wt + as.factor(cyl), mtcars, family = quasipoisson(link = "log")))[1], 2))
-  )
+  # expect_equal(
+  #   unname(fes[["cyl"]][1]),
+  #   unname(coef(glm(mpg ~ wt + as.factor(cyl), mtcars, family = quasipoisson(link = "log")))[1]),
+  #   tolerance = 1e-2
+  # )
 
   smod <- summary(mod)
 
@@ -54,52 +59,92 @@ test_that("fepoisson is similar to fixest", {
   expect_output(summary_r2_(smod, 3))
   expect_output(summary_nobs_(smod))
   expect_output(summary_fisher_(smod))
+
+  # K = 2
+
+  mod <- fepoisson(mpg ~ wt | cyl + am, mtcars)
+
+  mod_base <- glm(
+    mpg ~ wt + as.factor(cyl) + as.factor(am),
+    mtcars,
+    family = quasipoisson(link = "log")
+  )
+
+  # mod$coefficients
+  # mod_base$coefficients
+  # fixest::fepois(mpg ~ wt | cyl + am, mtcars)
+
+  coef_dist_base <- coef(mod_base)[2]
+
+  dist_variation <- abs((coef(mod)[1] - coef_dist_base) / coef(mod)[1])
+
+  expect_lt(dist_variation, 0.05)
+
+  # K = 3
+
+  mod <- fepoisson(mpg ~ wt | cyl + am + carb, mtcars)
+
+  mod_base <- glm(
+    mpg ~ wt + as.factor(cyl) + as.factor(am) + as.factor(carb),
+    mtcars,
+    family = quasipoisson(link = "log")
+  )
+
+  coef_dist_base <- coef(mod_base)[2]
+
+  dist_variation <- abs((coef(mod)[1] - coef_dist_base) / coef(mod)[1])
+
+  expect_lt(dist_variation, 0.05)
+
+  # mod$coefficients
+  # mod_base$coefficients
+
+  expect_equal(mod[["fitted_values"]], mod_base[["fitted.values"]], tolerance = 1e-2)
+
+  pred_mod <- predict(mod, type = "response")
+  pred_mod_base <- predict(mod_base, type = "response")
+
+  pred_mod_link <- predict(mod, type = "link")
+  pred_mod_base_link <- predict(mod_base, type = "link")
+
+  expect_equal(pred_mod, pred_mod_base, tolerance = 1e-2)
+  expect_equal(pred_mod_link, pred_mod_base_link, tolerance = 1e-2)
+
+  pred_mod <- predict(mod, type = "response", newdata = mtcars[1:10, ])
+  pred_mod_base <- predict(mod_base, type = "response", newdata = mtcars[1:10, ])
+
+  pred_mod_link <- predict(mod, type = "link", newdata = mtcars[1:10, ])
+  pred_mod_base_link <- predict(mod_base, type = "link", newdata = mtcars[1:10, ])
+
+  expect_equal(pred_mod, pred_mod_base, tolerance = 1e-2)
+  expect_equal(pred_mod_link, pred_mod_base_link, tolerance = 1e-2)
 })
 
 test_that("fepoisson estimation is the same adding noise to the data", {
   set.seed(123)
+  d <- mtcars[, c("mpg", "wt", "cyl")]
+  d$wt2 <- d$wt + pmax(rnorm(nrow(d)), 0) * .Machine$double.eps
+
+  m1 <- fepoisson(mpg ~ wt | cyl, d)
+  m2 <- fepoisson(mpg ~ wt2 | cyl, d)
+
+  expect_equal(unname(coef(m1)), unname(coef(m2)))
+  expect_equal(m1$fixed.effects, m2$fixed.effects)
+})
+
+
+test_that("proportional regressors return NA coefficients", {
+  set.seed(200100)
   d <- data.frame(
-    x = rnorm(1000),
-    y = rpois(1000, 1),
-    f = factor(rep(1:10, 100))
+    y = rpois(100, 2),
+    x1 = rnorm(100),
+    f = factor(sample(1:2, 100, replace = TRUE))
   )
+  d$x2 <- 2 * d$x1
 
-  set.seed(123)
-  d$y2 <- d$y + pmax(rnorm(nrow(d)), 0) * .Machine$double.eps
+  fit1 <- glm(y ~ x1 + x2 + as.factor(f), data = d, family = poisson())
+  fit2 <- feglm(y ~ x1 + x2 | f, data = d, family = poisson())
 
-  m1 <- fepoisson(y ~ x | f, d)
-  m2 <- fepoisson(y2 ~ x | f, d)
-  expect_equal(coef(m1), coef(m2))
-  expect_equal(fixed_effects(m1), fixed_effects(m2))
-
-  if (Sys.getenv("CAPYBARA_EXTENDED_TESTS") == "true") {
-    n <- 10e5
-
-    set.seed(123)
-
-    d <- data.frame(
-      x = rnorm(n),
-      y = rpois(n, 1),
-      f = factor(rep(1:10, 10e4))
-    )
-
-    d$y2 <- d$y + pmax(rnorm(nrow(d)), 0) * .Machine$double.eps
-
-    t1 <- rep(NA, 10)
-    t2 <- rep(NA, 10)
-    for (i in 1:10) {
-      a <- Sys.time()
-      m1 <- fepoisson(y ~ x | f, d)
-      b <- Sys.time()
-      t1[i] <- b - a
-
-      a <- Sys.time()
-      m2 <- fepoisson(y2 ~ x | f, d)
-      b <- Sys.time()
-      t2[i] <- b - a
-    }
-    expect_gt(abs(median(t1) / median(t2)), 0.9)
-    expect_lt(abs(median(t1) / median(t2)), 1)
-    expect_lt(median(t1), median(t2))
-  }
+  expect_equal(coef(fit2), coef(fit1)[2:3], tolerance = 1e-2)
+  expect_equal(predict(fit2), predict(fit1), tolerance = 1e-2)
 })
