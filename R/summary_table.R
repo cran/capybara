@@ -6,28 +6,41 @@
 #' @param stars Whether to include significance stars. The default is \code{TRUE}.
 #' @param latex Whether to output as LaTeX code. The default is \code{FALSE}.
 #' @param model_names Optional vector of custom model names
+#' @param caption Optional caption for the table (LaTeX only)
+#' @param label Optional label for cross-referencing (LaTeX only)
+#' @param position LaTeX float position specifier (LaTeX only). The default is
+#'   \code{"htbp"}.
 #' @examples
-#' m1 <- felm(mpg ~ wt | cyl, mtcars)
-#' m2 <- fepoisson(mpg ~ wt | cyl, mtcars)
+#' ross2004_subset <- ross2004[ross2004$year == 1999 &
+#'   ross2004$ltrade > quantile(ross2004$ltrade, 0.75), ]
+#'
+#' m1 <- felm(ltrade ~ ldist | ctry1, ross2004_subset)
+#' m2 <- fepoisson(ltrade ~ ldist | ctry1, ross2004_subset)
+#'
 #' summary_table(m1, m2, model_names = c("Linear", "Poisson"))
 #' @return A formatted table
 #' @export
-summary_table <- function(...,
-                          coef_digits = 3,
-                          se_digits = 3,
-                          stars = TRUE,
-                          latex = FALSE,
-                          model_names = NULL) {
+summary_table <- function(
+  ...,
+  coef_digits = 3,
+  se_digits = 3,
+  stars = TRUE,
+  latex = FALSE,
+  model_names = NULL,
+  caption = NULL,
+  label = NULL,
+  position = "htbp"
+) {
   # Collect models
   models <- list(...)
 
   # Check that all models are felm or feglm
   valid_classes <- c("felm", "feglm")
-  for (i in seq_along(models)) {
+  invisible(lapply(seq_along(models), function(i) {
     if (!inherits(models[[i]], valid_classes)) {
       stop("Model ", i, " is not a felm or feglm object")
     }
-  }
+  }))
 
   # Set model names
   if (is.null(model_names)) {
@@ -42,19 +55,27 @@ summary_table <- function(...,
   }
 
   # Extract coefficients and standard errors
-  summaries <- lapply(models, summary)
-  coef_list <- lapply(summaries, function(m) m$coefficients[, 1])
-  se_list <- lapply(summaries, function(m) m$coefficients[, 2])
-  p_list <- lapply(summaries, function(m) m$coefficients[, 4])
+  # vcov is precomputed during fitting (either inverse Hessian or sandwich)
+  # Use coef_table which is pre-computed in the model object
+  coef_list <- lapply(models, function(m) {
+    ct <- m$coef_table
+    setNames(as.vector(ct[, 1]), rownames(ct))
+  })
 
-  for (i in seq_along(coef_list)) {
-    names(coef_list[[i]]) <- rownames(summaries[[i]]$coefficients)
-    names(se_list[[i]]) <- rownames(summaries[[i]]$coefficients)
-    names(p_list[[i]]) <- rownames(summaries[[i]]$coefficients)
-  }
+  se_list <- lapply(models, function(m) {
+    ct <- m$coef_table
+    setNames(as.vector(ct[, 2]), rownames(ct))
+  })
+
+  p_list <- lapply(models, function(m) {
+    ct <- m$coef_table
+    setNames(as.vector(ct[, 4]), rownames(ct))
+  })
 
   # Get all unique variable names across models
-  all_vars <- unique(unlist(lapply(summaries, function(m) rownames(m$coefficients))))
+  all_vars <- unique(unlist(lapply(models, function(m) {
+    rownames(m$coef_table)
+  })))
 
   # Create a data frame for the results
   result_df <- data.frame(
@@ -63,35 +84,50 @@ summary_table <- function(...,
   )
 
   # Format coefficients for each model
-  for (i in seq_along(models)) {
-    model_col <- rep(NA_character_, nrow(result_df))
+  invisible(lapply(seq_along(models), function(i) {
+    coefs <- coef_list[[i]]
+    ses <- se_list[[i]]
+    pvals <- p_list[[i]]
 
-    for (j in seq_along(all_vars)) {
-      var <- all_vars[j]
-      if (var %in% names(coef_list[[i]])) {
-        coef_val <- formatC(coef_list[[i]][var], digits = coef_digits, format = "f")
-        se_val <- formatC(se_list[[i]][var], digits = se_digits, format = "f")
+    model_col <- vapply(
+      all_vars,
+      function(var) {
+        if (var %in% names(coefs)) {
+          coef_raw <- coefs[var]
+          se_raw <- ses[var]
+          p_val <- pvals[var]
 
-        if (stars) {
-          p_val <- p_list[[i]][var]
-          star <- ""
-          if (p_val < 0.001) {
-            star <- "***"
-          } else if (p_val < 0.01) {
-            star <- "**"
-          } else if (p_val < 0.05) {
-            star <- "*"
-          } else if (p_val < 0.1) star <- "."
+          # Handle NA coefficients
+          if (is.na(coef_raw)) {
+            return("NA")
+          }
 
-          model_col[j] <- sprintf("%s%s\n(%s)", coef_val, star, se_val)
+          coef_val <- formatC(coef_raw, digits = coef_digits, format = "f")
+          se_val <- formatC(se_raw, digits = se_digits, format = "f")
+
+          if (stars && !is.na(p_val)) {
+            star <- ""
+            if (p_val < 0.01) {
+              star <- "**"
+            } else if (p_val < 0.05) {
+              star <- "*"
+            } else if (p_val < 0.1) {
+              star <- "+"
+            }
+
+            sprintf("%s%s\n(%s)", coef_val, star, se_val)
+          } else {
+            sprintf("%s\n(%s)", coef_val, se_val)
+          }
         } else {
-          model_col[j] <- sprintf("%s\n(%s)", coef_val, se_val)
+          NA_character_
         }
-      }
-    }
+      },
+      character(1)
+    )
 
-    result_df[[model_names[i]]] <- model_col
-  }
+    result_df[[model_names[i]]] <<- model_col
+  }))
 
   # Fixed effects
   fe_rows <- list()
@@ -100,44 +136,85 @@ summary_table <- function(...,
   })))
 
   if (length(fe_names) > 0) {
-    for (fe in fe_names) {
-      fe_row <- c(fe, sapply(models, function(m) {
-        if (!is.null(m$nms_fe) && fe %in% names(m$nms_fe)) "Yes" else "No"
-      }))
-      fe_rows[[fe]] <- fe_row
-    }
+    fe_rows <- setNames(
+      lapply(fe_names, function(fe) {
+        c(
+          fe,
+          sapply(models, function(m) {
+            if (!is.null(m$nms_fe) && fe %in% names(m$nms_fe)) "Yes" else "No"
+          })
+        )
+      }),
+      fe_names
+    )
   }
+
+  # SE type row (from vcov_type stored on each model)
+  vcov_label_map <- c(
+    "iid" = "IID",
+    "hetero" = "Heteroskedastic-robust",
+    "cluster" = "Cluster-robust",
+    "m-estimator" = "Cluster-robust (M-est.)",
+    "m-estimator-dyadic" = "Dyadic-robust",
+    "dyadic" = "Dyadic-robust"
+  )
+  se_type_row <- c(
+    "SE type",
+    sapply(models, function(m) {
+      vt <- m[["vcov_type"]]
+      if (is.null(vt)) {
+        ""
+      } else {
+        lbl <- vcov_label_map[vt]
+        if (is.na(lbl)) vt else lbl
+      }
+    })
+  )
 
   # Add model statistics
   stats_rows <- list()
 
-  obs_row <- c("N", sapply(models, function(m) {
-    if (inherits(m, "felm")) {
-      format(as.numeric(m$nobs["nobs_full"]), big.mark = ",")
-    } else {
-      if (is.vector(m$nobs) && length(m$nobs) > 1) {
-        if ("nobs" %in% names(m$nobs)) {
-          format(as.numeric(m$nobs["nobs"]), big.mark = ",")
-        } else {
-          format(as.numeric(m$nobs[1]), big.mark = ",")
-        }
+  obs_row <- c(
+    "N",
+    sapply(models, function(m) {
+      nobs_vec <- m$nobs
+      if (inherits(m, "felm")) {
+        format(as.numeric(nobs_vec["nobs_full"]), big.mark = ",")
       } else {
-        format(as.numeric(m$nobs), big.mark = ",")
+        if (is.vector(nobs_vec) && length(nobs_vec) > 1) {
+          if ("nobs" %in% names(nobs_vec)) {
+            format(as.numeric(nobs_vec["nobs"]), big.mark = ",")
+          } else {
+            format(as.numeric(nobs_vec[1]), big.mark = ",")
+          }
+        } else {
+          format(as.numeric(nobs_vec), big.mark = ",")
+        }
       }
-    }
-  }))
+    })
+  )
 
-  r2_row <- c(if (latex) "$R^2$" else "R-squared", sapply(models, function(m) {
-    if (inherits(m, "felm")) {
-      formatC(summary(m)$r.squared, digits = 3, format = "f")
-    } else if (inherits(m, "feglm") && !is.null(summary(m)$pseudo.rsq)) {
-      formatC(summary(m)$pseudo.rsq, digits = 3, format = "f")
-    } else {
-      ""
-    }
-  }))
+  # Check if any model is a GLM
+
+  r2_label <- ifelse(latex, "$R^2$", "R-squared")
+
+  r2_row <- c(
+    r2_label,
+    sapply(models, function(m) {
+      if (!is.null(m$r_squared)) {
+        formatC(m$r_squared, digits = 3, format = "f")
+      } else {
+        ""
+      }
+    })
+  )
 
   # Output in the requested format
+
+  # Only include r2_row / se_type_row when at least one model has a value
+  stat_rows_optional <- list()
+  if (any(r2_row[-1] != "")) stat_rows_optional <- c(stat_rows_optional, list(r2_row))
+  if (any(se_type_row[-1] != "")) stat_rows_optional <- c(stat_rows_optional, list(se_type_row))
 
   result2_df <- rbind(
     c("", rep("", length(models))), # for spacing
@@ -145,14 +222,16 @@ summary_table <- function(...,
     do.call(rbind, fe_rows),
     c("", rep("", length(models))), # for spacing
     obs_row,
-    r2_row
+    if (length(stat_rows_optional) > 0) do.call(rbind, stat_rows_optional) else NULL
   )
 
-  colnames(result2_df) <- colnames(result_df)
+  # Set column names from result_df
+  col_names <- colnames(result_df)
+  colnames(result2_df) <- col_names
 
   # Format the output and return it directly (no print call)
   res <- if (latex) {
-    format_latex_table(result_df, result2_df, stars)
+    format_latex_table(result_df, result2_df, stars, label, caption, position)
   } else {
     format_console_table(result_df, result2_df, stars)
   }
@@ -169,122 +248,158 @@ format_console_table <- function(result_df, result2_df, stars) {
   # Calculate column widths for proper alignment
   col_widths <- apply(full_df, 2, function(col) {
     # Split coefficient/SE pairs and find max width
-    max_width <- max(nchar(col), na.rm = TRUE)
-    # Account for newlines by checking each part
-    for (i in seq_along(col)) {
-      if (!is.na(col[i]) && grepl("\n", col[i])) {
-        parts <- strsplit(col[i], "\n")[[1]]
-        max_width <- max(max_width, max(nchar(parts)))
-      }
-    }
+    max_width <- Reduce(
+      function(acc, i) {
+        cell <- as.character(col[i])
+        if (!is.na(cell) && grepl("\n", cell)) {
+          parts <- strsplit(cell, "\n")[[1]]
+          max(acc, max(nchar(parts)))
+        } else {
+          acc
+        }
+      },
+      seq_along(col),
+      init = max(nchar(as.character(col)), na.rm = TRUE)
+    )
     max_width + 2 # Add padding
   })
 
   # Create header with center alignment
   header_names <- as.character(colnames(result_df))
-  header <- paste0("| ", paste0(
-    mapply(function(name, width) {
-      # Center align header text
-      name <- as.character(name) # Ensure it's a simple string
-      padding <- width - nchar(name)
-      left_pad <- floor(padding / 2)
-      right_pad <- ceiling(padding / 2)
-      paste0(
-        paste(rep(" ", left_pad), collapse = ""),
-        name,
-        paste(rep(" ", right_pad), collapse = "")
-      )
-    }, header_names, col_widths),
-    collapse = " | "
-  ), " |")
+  header <- paste0(
+    "| ",
+    paste0(
+      mapply(
+        function(name, width) {
+          # Center align header text
+          name <- as.character(name) # Ensure it's a simple string
+          padding <- width - nchar(name)
+          left_pad <- max(0L, floor(padding / 2))
+          right_pad <- max(0L, ceiling(padding / 2))
+          paste0(
+            paste(rep(" ", left_pad), collapse = ""),
+            name,
+            paste(rep(" ", right_pad), collapse = "")
+          )
+        },
+        header_names,
+        col_widths
+      ),
+      collapse = " | "
+    ),
+    " |"
+  )
 
   # Create separator with proper width
-  separator <- paste0("|", paste0(
-    mapply(function(width) {
-      paste0(rep("-", width + 2), collapse = "")
-    }, col_widths),
-    collapse = "|"
-  ), "|")
+  separator <- paste0(
+    "|",
+    paste0(
+      mapply(
+        function(width) {
+          paste0(rep("-", width + 2), collapse = "")
+        },
+        col_widths
+      ),
+      collapse = "|"
+    ),
+    "|"
+  )
   separator <- gsub(" ", "-", separator)
 
   # Generate table rows
-  table_rows <- character(0)
-
-  for (i in 1:nrow(full_df)) {
+  table_rows <- unlist(lapply(1:nrow(full_df), function(i) {
     # First detect how many lines we need for this row
-    lines_needed <- 1 # At least 1 line per row
-    for (j in 1:ncol(full_df)) {
-      cell <- full_df[i, j]
-      if (!is.na(cell) && grepl("\n", cell)) {
-        parts <- strsplit(cell, "\n")[[1]]
-        lines_needed <- max(lines_needed, length(parts))
-      }
-    }
+    lines_needed <- max(
+      1L,
+      vapply(
+        1:ncol(full_df),
+        function(j) {
+          cell <- as.character(full_df[i, j])
+          if (!is.na(cell) && grepl("\n", cell)) {
+            length(strsplit(cell, "\n")[[1]])
+          } else {
+            1L
+          }
+        },
+        integer(1)
+      )
+    )
 
     # Create an array to hold all lines for this table row
-    row_lines <- character(lines_needed)
+    vapply(
+      1:lines_needed,
+      function(line) {
+        line_cells <- vapply(
+          1:ncol(full_df),
+          function(j) {
+            cell <- as.character(full_df[i, j])
 
-    # For each column, fill the appropriate lines
-    for (line in 1:lines_needed) {
-      line_cells <- character(ncol(full_df))
+            if (is.na(cell)) {
+              formatC("", width = col_widths[j], format = "s", flag = " ")
+            } else if (grepl("\n", cell)) {
+              # Split multi-line cells
+              parts <- strsplit(cell, "\n")[[1]]
 
-      for (j in 1:ncol(full_df)) {
-        cell <- full_df[i, j]
-
-        if (is.na(cell)) {
-          cell_text <- formatC("", width = col_widths[j], format = "s", flag = " ")
-        } else if (grepl("\n", cell)) {
-          # Split multi-line cells
-          parts <- strsplit(cell, "\n")[[1]]
-
-          if (line <= length(parts)) {
-            # This line exists in the cell
-            if (j == 1) {
-              # Left align first column
-              cell_text <- formatC(parts[line], width = col_widths[j], format = "s", flag = "-")
+              if (line <= length(parts)) {
+                # This line exists in the cell
+                if (j == 1) {
+                  # Left align first column
+                  formatC(
+                    parts[line],
+                    width = col_widths[j],
+                    format = "s",
+                    flag = "-"
+                  )
+                } else {
+                  # Right align other columns
+                  formatC(
+                    parts[line],
+                    width = col_widths[j],
+                    format = "s",
+                    flag = " "
+                  )
+                }
+              } else {
+                # Fill with empty space
+                formatC("", width = col_widths[j], format = "s", flag = " ")
+              }
             } else {
-              # Right align other columns
-              cell_text <- formatC(parts[line], width = col_widths[j], format = "s", flag = " ")
+              # Single line cell - only show on first line
+              if (line == 1) {
+                if (j == 1) {
+                  # Left align first column
+                  formatC(cell, width = col_widths[j], format = "s", flag = "-")
+                } else {
+                  # Right align other columns
+                  formatC(cell, width = col_widths[j], format = "s", flag = " ")
+                }
+              } else {
+                formatC("", width = col_widths[j], format = "s", flag = " ")
+              }
             }
-          } else {
-            # Fill with empty space
-            cell_text <- formatC("", width = col_widths[j], format = "s", flag = " ")
-          }
-        } else {
-          # Single line cell - only show on first line
-          if (line == 1) {
-            if (j == 1) {
-              # Left align first column
-              cell_text <- formatC(cell, width = col_widths[j], format = "s", flag = "-")
-            } else {
-              # Right align other columns
-              cell_text <- formatC(cell, width = col_widths[j], format = "s", flag = " ")
-            }
-          } else {
-            cell_text <- formatC("", width = col_widths[j], format = "s", flag = " ")
-          }
-        }
+          },
+          character(1)
+        )
 
-        line_cells[j] <- cell_text
-      }
-
-      # Assemble this line
-      row_lines[line] <- paste0("| ", paste(line_cells, collapse = " | "), " |")
-    }
-
-    # Combine all lines for this row
-    table_rows <- c(table_rows, row_lines)
-  }
+        # Assemble this line
+        paste0("| ", paste(line_cells, collapse = " | "), " |")
+      },
+      character(1)
+    )
+  }))
 
   # Add legend
   if (stars) {
-    legend <- "\nStandard errors in parenthesis\nSignificance levels: *** p < 0.001; ** p < 0.01; * p < 0.05; . p < 0.1"
+    legend <- "\nStandard errors in parenthesis\nSignificance levels: ** p < 0.01; * p < 0.05; + p < 0.10"
   } else {
     legend <- ""
   }
 
   # Create content and metadata separately
-  table_content <- paste(c(header, separator, table_rows, legend), collapse = "\n")
+  table_content <- paste(
+    c(header, separator, table_rows, legend),
+    collapse = "\n"
+  )
 
   # Create a new S3 object with better structure
   obj <- list(
@@ -297,128 +412,143 @@ format_console_table <- function(result_df, result2_df, stars) {
 }
 
 # LaTeX formatter
-format_latex_table <- function(result_df, result2_df, stars, include_environment = FALSE) {
-  # Convert to data frame
+format_latex_table <- function(
+  result_df,
+  result2_df,
+  stars,
+  label = NULL,
+  caption = NULL,
+  position = "htbp"
+) {
   full_df <- rbind(as.matrix(result_df), result2_df)
-
-  # Create LaTeX code
   n_cols <- ncol(full_df)
+  col_spec <- paste0("l", paste(rep("c", n_cols - 1), collapse = ""))
 
-  # Start with empty vector for LaTeX code
-  latex <- character(0)
-
-  # Only include table environment if requested
-  if (include_environment) {
-    latex <- c(
-      latex,
-      "\\begin{table}[htbp]",
-      "\\centering",
-      "\\caption{Regression Results}"
-    )
+  read_tmpl <- function(name) {
+    path <- system.file("templates", name, package = "capybara", mustWork = TRUE)
+    paste(readLines(path, warn = FALSE), collapse = "\n")
   }
 
-  # Add tabular environment
-  latex <- c(
-    latex,
-    paste0("\\begin{tabular}{l", paste(rep("c", n_cols - 1), collapse = ""), "}"),
-    "\\toprule"
+  fill_tmpl <- function(tmpl, vals) {
+    for (key in names(vals)) {
+      tmpl <- gsub(paste0("{{", key, "}}"), vals[[key]], tmpl, fixed = TRUE)
+    }
+    tmpl
+  }
+
+  # Read all templates once
+  tmpl <- list(
+    table       = read_tmpl("latex_table.tex"),
+    row         = read_tmpl("row.tex"),
+    midrule_row = read_tmpl("midrule_row.tex"),
+    footnotes   = read_tmpl("footnotes.tex"),
+    caption     = read_tmpl("caption.tex"),
+    label       = read_tmpl("label.tex")
   )
 
-  # Header row
-  latex <- c(latex, paste(colnames(full_df), collapse = " & "), "\\\\")
+  make_row <- function(cols) fill_tmpl(tmpl$row, list(cols = paste(cols, collapse = " & ")))
+  make_midrule_row <- function(cols) fill_tmpl(tmpl$midrule_row, list(cols = paste(cols, collapse = " & ")))
 
-  # Midrule
-  latex <- c(latex, "\\midrule")
+  # --- Build body (header + coefficient rows + stat rows) ---
 
-  # Process coefficients
-  for (i in 1:nrow(result_df)) {
+  body <- c(make_row(colnames(full_df)), "\\midrule")
+
+  # Coefficient rows
+  coef_rows <- unlist(lapply(seq_len(nrow(result_df)), function(i) {
     row <- result_df[i, ]
+    var_name <- gsub("_", "\\_", as.character(row[1]), fixed = TRUE)
 
-    # First process variable name
-    var_name <- as.character(row[1])
-
-    # Create coefficient row
     coef_values <- character(ncol(row))
-    coef_values[1] <- var_name # Variable name
-
-    # Create SE row (empty in first column)
+    coef_values[1] <- var_name
     se_values <- character(ncol(row))
-    se_values[1] <- "" # Empty first column
+    se_values[1] <- ""
 
-    # Fill in coefficient and SE values for each model
-    for (j in 2:ncol(row)) {
-      cell <- row[j]
-
+    cell_results <- lapply(2:ncol(row), function(j) {
+      cell <- as.character(row[j])
       if (is.na(cell) || cell == "") {
-        coef_values[j] <- ""
-        se_values[j] <- ""
+        list(coef = "", se = "")
       } else if (grepl("\n", cell)) {
-        # Split into coef and SE
-        parts <- strsplit(as.character(cell), "\n")[[1]]
-        coef_values[j] <- parts[1] # Coefficient with stars
-        se_values[j] <- parts[2] # SE with parentheses
+        parts <- strsplit(cell, "\n")[[1]]
+        coef_with_stars <- parts[1]
+        if (grepl("\\*\\*$", coef_with_stars)) {
+          coef_with_stars <- sub("\\*\\*$", "$^{**}$", coef_with_stars)
+        } else if (grepl("\\*$", coef_with_stars)) {
+          coef_with_stars <- sub("\\*$", "$^{*}$", coef_with_stars)
+        } else if (grepl("\\+$", coef_with_stars)) coef_with_stars <- sub("\\+$", "$^{+}$", coef_with_stars)
+        list(coef = coef_with_stars, se = parts[2])
       } else {
-        coef_values[j] <- as.character(cell)
-        se_values[j] <- ""
+        list(coef = as.character(cell), se = "")
       }
-    }
+    })
 
-    # Add the coefficient row
-    latex <- c(latex, paste(coef_values, collapse = " & "), "\\\\")
+    coef_values[2:ncol(row)] <- vapply(cell_results, function(x) x$coef, character(1))
+    se_values[2:ncol(row)] <- vapply(cell_results, function(x) x$se, character(1))
 
-    # Add the SE row if it has any content
-    if (any(nchar(se_values) > 0)) {
-      latex <- c(latex, paste(se_values, collapse = " & "), "\\\\")
-    }
-  }
+    out <- make_row(coef_values)
+    if (any(nchar(se_values) > 0)) out <- c(out, make_row(se_values))
+    out
+  }))
 
-  # Midrule before stats
-  # latex <- c(latex, "\\midrule")
+  body <- c(body, coef_rows)
 
-  # Add stat rows
+  # Stat rows — midrule_row for section headers, plain row otherwise
+  midrule_triggers <- c("Fixed effects", "N")
   stat_rows <- apply(result2_df, 1, function(row) {
     if (all(row == "")) {
       return(NULL)
     }
-    row_text <- paste(ifelse(is.na(row), "", row), collapse = " & ")
-    paste0(row_text, " \\\\")
+    row_esc <- gsub("_", "\\_", row, fixed = TRUE)
+    cols <- ifelse(is.na(row_esc), "", row_esc)
+    if (trimws(row[1]) %in% midrule_triggers) make_midrule_row(cols) else make_row(cols)
   })
-  latex <- c(latex, stat_rows[!sapply(stat_rows, is.null)])
+  body <- c(body, stat_rows[!vapply(stat_rows, is.null, logical(1))])
 
-  latex <- gsub(
-    "^Fixed effects ",
-    "\\\\midrule Fixed effects ", latex
-  )
+  body_text <- paste(body, collapse = "\n")
 
-  latex <- gsub(
-    "^N ",
-    "\\\\midrule N ", latex
-  )
+  # --- Fill main template ---
+  # When inside a Quarto chunk with a tbl- label, Quarto itself creates the
+  # \begin{table}\caption{...}\label{tbl-xxx}...\end{table} wrapper (driven by
+  # the tbl-cap and label chunk options).  If we also emit a full table float,
+  # the result is two nested floats: an empty "Table N" from Quarto and the real
+  # "Table N+1: Caption" from us.  In that context we must output only the inner
+  # tabular content and let Quarto supply the outer environment.
+  in_quarto_tbl <- nzchar(Sys.getenv("QUARTO_BIN_PATH")) &&
+    isTRUE(getOption("knitr.in.progress")) &&
+    tryCatch(
+      {
+        lbl <- knitr::opts_current$get("label")
+        !is.null(lbl) && nzchar(lbl) && grepl("^tbl-", lbl)
+      },
+      error = function(e) FALSE
+    )
 
-  # Table footer
-  latex <- c(latex, "\\bottomrule")
+  footnotes_text <- if (stars) fill_tmpl(tmpl$footnotes, list(n_cols = n_cols)) else ""
 
-  # Add significance legend
-  if (stars) {
-    latex <- c(latex, paste0(
-      "\\multicolumn{", n_cols, "}{l}{\\footnotesize Standard errors in parentheses} \\\\ \n",
-      "\\multicolumn{", n_cols, "}{l}{\\footnotesize Significance levels: ",
-      "$^{***}\\: p < 0.001;\\: ^{**}\\: p < 0.01;\\: ^{*}\\: p < 0.05;\\: ^{.}\\: p < 0.1$}"
+  content <- if (in_quarto_tbl) {
+    # Emit only the tabular — Quarto wraps it with caption, label, and position.
+    paste0(
+      "\\centering\n",
+      "\\begin{tabular}{", col_spec, "}\n",
+      "\\toprule\n",
+      body_text, "\n",
+      "\\bottomrule\n",
+      if (nzchar(footnotes_text)) paste0(footnotes_text, "\n") else "",
+      "\\end{tabular}"
+    )
+  } else {
+    caption_text <- if (is.null(caption)) "" else fill_tmpl(tmpl$caption, list(caption = caption))
+    label_text <- if (is.null(label) || !nzchar(label)) "" else fill_tmpl(tmpl$label, list(label = label))
+    fill_tmpl(tmpl$table, list(
+      position  = position,
+      caption   = caption_text,
+      label     = label_text,
+      col_spec  = col_spec,
+      body      = body_text,
+      footnotes = footnotes_text
     ))
   }
 
-  # Close environments
-  latex <- c(latex, "\\end{tabular}")
-
-  if (include_environment) {
-    latex <- c(latex, "\\end{table}")
-  }
-
-  # Create a new S3 object with better structure
-  obj <- list(
-    content = paste(latex, collapse = "\n"),
-    type = "latex"
-  )
+  obj <- list(content = content, type = "latex")
   class(obj) <- "summary_table"
   obj
 }

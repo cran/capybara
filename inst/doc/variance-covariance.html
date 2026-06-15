@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Different Variance-Covariance Estimators</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Different Variance-Covariance
+Estimators</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(capybara)</span></code></pre></div>
+<p>A very quick verification of Ross (2004) is to obtain the
+coefficients for the OLS model from table 1:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">felm</span>(ltrade <span class="sc">~</span> bothin <span class="sc">+</span> onein <span class="sc">+</span> gsp <span class="sc">+</span> ldist <span class="sc">+</span> lrgdp <span class="sc">+</span> lrgdppc <span class="sc">+</span> regional <span class="sc">+</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  custrict <span class="sc">+</span> comlang <span class="sc">+</span> border <span class="sc">+</span> landl <span class="sc">+</span> island <span class="sc">+</span> lareap <span class="sc">+</span> comcol <span class="sc">+</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  curcol <span class="sc">+</span> colony <span class="sc">+</span> comctry <span class="sc">|</span> year, <span class="at">data =</span> ross2004)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>Formula<span class="sc">:</span> ltrade <span class="sc">~</span> bothin <span class="sc">+</span> onein <span class="sc">+</span> gsp <span class="sc">+</span> ldist <span class="sc">+</span> lrgdp <span class="sc">+</span> lrgdppc <span class="sc">+</span> regional <span class="sc">+</span> </span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>    custrict <span class="sc">+</span> comlang <span class="sc">+</span> border <span class="sc">+</span> landl <span class="sc">+</span> island <span class="sc">+</span> lareap <span class="sc">+</span> comcol <span class="sc">+</span> </span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>    curcol <span class="sc">+</span> colony <span class="sc">+</span> comctry <span class="sc">|</span> year</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>Estimates<span class="sc">:</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="er">|</span>          <span class="er">|</span> Estimate <span class="sc">|</span> Std. Error <span class="sc">|</span> z value   <span class="sc">|</span> <span class="fu">Pr</span>(<span class="sc">&gt;</span><span class="er">|</span>z<span class="sc">|</span>)  <span class="sc">|</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="er">|</span><span class="sc">----------</span><span class="er">|</span><span class="sc">----------</span><span class="er">|</span><span class="sc">------------</span><span class="er">|</span><span class="sc">-----------</span><span class="er">|</span><span class="sc">-----------</span><span class="er">|</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="er">|</span> bothin   <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.0423</span> <span class="sc">|</span>     <span class="fl">0.0159</span> <span class="sc">|</span>   <span class="sc">-</span><span class="fl">2.6540</span> <span class="sc">|</span> <span class="fl">0.0080</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="er">|</span> onein    <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.0583</span> <span class="sc">|</span>     <span class="fl">0.0154</span> <span class="sc">|</span>   <span class="sc">-</span><span class="fl">3.7722</span> <span class="sc">|</span> <span class="fl">0.0002</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="er">|</span> gsp      <span class="sc">|</span>   <span class="fl">0.8585</span> <span class="sc">|</span>     <span class="fl">0.0111</span> <span class="sc">|</span>   <span class="fl">77.0829</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="er">|</span> ldist    <span class="sc">|</span>  <span class="sc">-</span><span class="fl">1.1190</span> <span class="sc">|</span>     <span class="fl">0.0061</span> <span class="sc">|</span> <span class="sc">-</span><span class="fl">183.0863</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="er">|</span> lrgdp    <span class="sc">|</span>   <span class="fl">0.9159</span> <span class="sc">|</span>     <span class="fl">0.0026</span> <span class="sc">|</span>  <span class="fl">355.9087</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="er">|</span> lrgdppc  <span class="sc">|</span>   <span class="fl">0.3214</span> <span class="sc">|</span>     <span class="fl">0.0039</span> <span class="sc">|</span>   <span class="fl">83.2804</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="er">|</span> regional <span class="sc">|</span>   <span class="fl">1.1988</span> <span class="sc">|</span>     <span class="fl">0.0360</span> <span class="sc">|</span>   <span class="fl">33.2956</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="er">|</span> custrict <span class="sc">|</span>   <span class="fl">1.1181</span> <span class="sc">|</span>     <span class="fl">0.0374</span> <span class="sc">|</span>   <span class="fl">29.8774</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="er">|</span> comlang  <span class="sc">|</span>   <span class="fl">0.3125</span> <span class="sc">|</span>     <span class="fl">0.0110</span> <span class="sc">|</span>   <span class="fl">28.3085</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="er">|</span> border   <span class="sc">|</span>   <span class="fl">0.5257</span> <span class="sc">|</span>     <span class="fl">0.0266</span> <span class="sc">|</span>   <span class="fl">19.7328</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="er">|</span> landl    <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.2706</span> <span class="sc">|</span>     <span class="fl">0.0093</span> <span class="sc">|</span>  <span class="sc">-</span><span class="fl">29.0310</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="er">|</span> island   <span class="sc">|</span>   <span class="fl">0.0419</span> <span class="sc">|</span>     <span class="fl">0.0095</span> <span class="sc">|</span>    <span class="fl">4.4335</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="er">|</span> lareap   <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.0967</span> <span class="sc">|</span>     <span class="fl">0.0020</span> <span class="sc">|</span>  <span class="sc">-</span><span class="fl">47.5692</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="er">|</span> comcol   <span class="sc">|</span>   <span class="fl">0.5846</span> <span class="sc">|</span>     <span class="fl">0.0162</span> <span class="sc">|</span>   <span class="fl">36.1094</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="er">|</span> curcol   <span class="sc">|</span>   <span class="fl">1.0751</span> <span class="sc">|</span>     <span class="fl">0.1067</span> <span class="sc">|</span>   <span class="fl">10.0763</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="er">|</span> colony   <span class="sc">|</span>   <span class="fl">1.1638</span> <span class="sc">|</span>     <span class="fl">0.0312</span> <span class="sc">|</span>   <span class="fl">37.3391</span> <span class="sc">|</span> <span class="fl">0.0000</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="er">|</span> comctry  <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.0163</span> <span class="sc">|</span>     <span class="fl">0.2623</span> <span class="sc">|</span>   <span class="sc">-</span><span class="fl">0.0622</span> <span class="sc">|</span> <span class="fl">0.9504</span>    <span class="sc">|</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>Significance codes<span class="sc">:</span> <span class="er">**</span> p <span class="sc">&lt;</span> <span class="fl">0.01</span>; <span class="sc">*</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span>; <span class="sc">+</span> p <span class="sc">&lt;</span> <span class="fl">0.10</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a>R<span class="sc">-</span>squared     <span class="sc">:</span> <span class="fl">0.648</span> </span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a>Adj. R<span class="sc">-</span>squared<span class="sc">:</span> <span class="fl">0.6479</span> </span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a>Fixed effects<span class="sc">:</span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a>  year<span class="sc">:</span> <span class="dv">52</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a>Number of observations<span class="sc">:</span> Full <span class="dv">234597</span>; Missing <span class="dv">0</span>; Perfect classification <span class="dv">0</span></span></code></pre></div>
+<p>This does not involve many fixed effects. However, capybara will be
+particularly useful to obtain different standard errors for the same
+functional form, which is the main focus of table 4B in Cameron &amp;
+Miller (2014).</p>
+<p>Table 4B shows the following clustering methods that we can replicate
+with the third part of the model formula
+(e.g. <code>y ~ x1 + x2 + ... | fe1 + fe2 | cl1 + cl2</code>) and using
+the <code>vcov</code> argument to select how the clustering variables
+are used:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"><code>vcov</code> value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>&quot;iid&quot;</code></td>
+<td align="left">Default OLS (i.i.d. errors)</td>
+</tr>
+<tr class="even">
+<td align="left"><code>&quot;hetero&quot;</code></td>
+<td align="left">Heteroskedastic-robust (HC0)</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>&quot;cluster&quot;</code></td>
+<td align="left">One-way cluster sandwich</td>
+</tr>
+<tr class="even">
+<td align="left"><code>&quot;m-estimator&quot;</code></td>
+<td align="left">One-way M-estimator sandwich</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>&quot;dyadic&quot;</code></td>
+<td align="left">Dyadic-robust (Cameron &amp; Miller, 2014)</td>
+</tr>
+</tbody>
+</table>
+<p>Capybara provides an <code>update()</code> method to easily modify
+the formula for each model, as we need to change the clustering
+variables for each model, which avoids error-prone copy-pasting of the
+full formula every time.</p>
+<div id="iid-no-cluster-part-in-formula" class="section level2">
+<h2>IID (no cluster part in formula)</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>fml <span class="ot">&lt;-</span> ltrade <span class="sc">~</span> bothin <span class="sc">+</span> onein <span class="sc">+</span> gsp <span class="sc">+</span> ldist <span class="sc">+</span> lrgdp <span class="sc">+</span> lrgdppc <span class="sc">+</span> regional <span class="sc">+</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  custrict <span class="sc">+</span> comlang <span class="sc">+</span> border <span class="sc">+</span> landl <span class="sc">+</span> island <span class="sc">+</span> lareap <span class="sc">+</span> comcol <span class="sc">+</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  curcol <span class="sc">+</span> colony <span class="sc">+</span> comctry <span class="sc">|</span> year</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>fit_iid <span class="ot">&lt;-</span> <span class="fu">felm</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  fml,</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="at">data =</span> ross2004, <span class="at">vcov =</span> <span class="st">&quot;iid&quot;</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="heteroskedastic-robust-hc0" class="section level2">
+<h2>Heteroskedastic-robust (HC0)</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>fit_hetero <span class="ot">&lt;-</span> <span class="fu">felm</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  fml,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">data =</span> ross2004, <span class="at">vcov =</span> <span class="st">&quot;hetero&quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="one-way-cluster-on-country-pair-gh" class="section level2">
+<h2>One-way: cluster on country-pair (g,h)</h2>
+<p>Note that multi-part formulas (e.g., <code>y ~ x | fe | cl</code>)
+are handled by the Formula package. Therefore, updating those needs an
+explicit <code>Formula::as.Formula()</code> call if the formula type was
+not specified initially.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>fml2 <span class="ot">&lt;-</span> <span class="fu">update</span>(Formula<span class="sc">::</span><span class="fu">as.Formula</span>(fml), . <span class="sc">~</span> . <span class="sc">|</span> . <span class="sc">|</span> pair)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>fit_pairs <span class="ot">&lt;-</span> <span class="fu">felm</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  fml2,</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>  <span class="at">data =</span> ross2004, <span class="at">vcov =</span> <span class="st">&quot;cluster&quot;</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="one-way-cluster-on-country-1-g" class="section level2">
+<h2>One-way: cluster on country 1 (g)</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>fit_ctry1 <span class="ot">&lt;-</span> <span class="fu">felm</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="fu">update</span>(fml2, . <span class="sc">~</span> . <span class="sc">|</span> . <span class="sc">|</span> ctry1),</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">data =</span> ross2004, <span class="at">vcov =</span> <span class="st">&quot;cluster&quot;</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="one-way-cluster-on-country-2-h" class="section level2">
+<h2>One-way: cluster on country 2 (h)</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>fit_ctry2 <span class="ot">&lt;-</span> <span class="fu">felm</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="fu">update</span>(fml2, . <span class="sc">~</span> . <span class="sc">|</span> . <span class="sc">|</span> ctry2),</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">data =</span> ross2004, <span class="at">vcov =</span> <span class="st">&quot;cluster&quot;</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="two-way-cluster-on-g-and-h-simultaneously" class="section level2">
+<h2>Two-way: cluster on (g) and (h) simultaneously</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>fit_2way <span class="ot">&lt;-</span> <span class="fu">felm</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="fu">update</span>(fml2, . <span class="sc">~</span> . <span class="sc">|</span> . <span class="sc">|</span> ctry1 <span class="sc">+</span> ctry2),</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="at">data =</span> ross2004, <span class="at">vcov =</span> <span class="st">&quot;cluster&quot;</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="dyadic-robust-cameron-miller-2014-sandwich-with-cross-dyad-correlations" class="section level2">
+<h2>Dyadic-robust: Cameron-Miller (2014) sandwich with cross-dyad
+correlations</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>fit_dyadic <span class="ot">&lt;-</span> <span class="fu">felm</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="fu">update</span>(fml2, . <span class="sc">~</span> . <span class="sc">|</span> . <span class="sc">|</span> ctry1 <span class="sc">+</span> ctry2),</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">data =</span> ross2004, <span class="at">vcov =</span> <span class="st">&quot;dyadic&quot;</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>)</span></code></pre></div>
+<p>With the above models, we can replicate Table 4B from Cameron &amp;
+Miller (2014) using <code>summary_table()</code>, another convenience
+function in capybara to display multiple models side-by-side. This
+completely avoids calling <code>summary()</code> on each model and then
+conducting post-processing to extract the relevant information for the
+table.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">summary_table</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  fit_iid, fit_hetero, fit_pairs, fit_ctry1, fit_ctry2, fit_2way, fit_dyadic,</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="at">model_names =</span> <span class="fu">c</span>(<span class="st">&quot;IID&quot;</span>, <span class="st">&quot;Hetero&quot;</span>, <span class="st">&quot;Pairs&quot;</span>, <span class="st">&quot;Country 1&quot;</span>, <span class="st">&quot;Country 2&quot;</span>, <span class="st">&quot;2-Way&quot;</span>, <span class="st">&quot;Dyadic&quot;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="sc">|</span>     Variable     <span class="sc">|</span>        IID         <span class="sc">|</span>          Hetero          <span class="sc">|</span>       Pairs        <span class="sc">|</span>     Country <span class="dv">1</span>      <span class="sc">|</span>     Country <span class="dv">2</span>      <span class="sc">|</span>       <span class="dv">2</span><span class="sc">-</span>Way        <span class="sc">|</span>       Dyadic       <span class="sc">|</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="er">|</span><span class="sc">------------------</span><span class="er">|</span><span class="sc">--------------------</span><span class="er">|</span><span class="sc">--------------------------</span><span class="er">|</span><span class="sc">--------------------</span><span class="er">|</span><span class="sc">--------------------</span><span class="er">|</span><span class="sc">--------------------</span><span class="er">|</span><span class="sc">--------------------</span><span class="er">|</span><span class="sc">--------------------</span><span class="er">|</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="er">|</span> bothin           <span class="sc">|</span>           <span class="sc">-</span><span class="fl">0.042</span><span class="sc">**</span> <span class="er">|</span>                  <span class="sc">-</span><span class="fl">0.042</span><span class="sc">*</span> <span class="er">|</span>             <span class="sc">-</span><span class="fl">0.042</span> <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.042</span> <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.042</span> <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.042</span> <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.042</span> <span class="sc">|</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.016</span>) <span class="sc">|</span>                  (<span class="fl">0.018</span>) <span class="sc">|</span>            (<span class="fl">0.053</span>) <span class="sc">|</span>            (<span class="fl">0.122</span>) <span class="sc">|</span>            (<span class="fl">0.107</span>) <span class="sc">|</span>            (<span class="fl">0.122</span>) <span class="sc">|</span>            (<span class="fl">0.186</span>) <span class="sc">|</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="er">|</span> onein            <span class="sc">|</span>           <span class="sc">-</span><span class="fl">0.058</span><span class="sc">**</span> <span class="er">|</span>                 <span class="sc">-</span><span class="fl">0.058</span><span class="sc">**</span> <span class="er">|</span>             <span class="sc">-</span><span class="fl">0.058</span> <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.058</span> <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.058</span> <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.058</span> <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.058</span> <span class="sc">|</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.015</span>) <span class="sc">|</span>                  (<span class="fl">0.018</span>) <span class="sc">|</span>            (<span class="fl">0.049</span>) <span class="sc">|</span>            (<span class="fl">0.095</span>) <span class="sc">|</span>            (<span class="fl">0.071</span>) <span class="sc">|</span>            (<span class="fl">0.095</span>) <span class="sc">|</span>            (<span class="fl">0.126</span>) <span class="sc">|</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="er">|</span> gsp              <span class="sc">|</span>            <span class="fl">0.859</span><span class="sc">**</span> <span class="er">|</span>                  <span class="fl">0.859</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.859</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.859</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.859</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.859</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.859</span><span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.011</span>) <span class="sc">|</span>                  (<span class="fl">0.009</span>) <span class="sc">|</span>            (<span class="fl">0.032</span>) <span class="sc">|</span>            (<span class="fl">0.098</span>) <span class="sc">|</span>            (<span class="fl">0.074</span>) <span class="sc">|</span>            (<span class="fl">0.098</span>) <span class="sc">|</span>            (<span class="fl">0.131</span>) <span class="sc">|</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="er">|</span> ldist            <span class="sc">|</span>           <span class="sc">-</span><span class="fl">1.119</span><span class="sc">**</span> <span class="er">|</span>                 <span class="sc">-</span><span class="fl">1.119</span><span class="sc">**</span> <span class="er">|</span>           <span class="sc">-</span><span class="fl">1.119</span><span class="sc">**</span> <span class="er">|</span>           <span class="sc">-</span><span class="fl">1.119</span><span class="sc">**</span> <span class="er">|</span>           <span class="sc">-</span><span class="fl">1.119</span><span class="sc">**</span> <span class="er">|</span>           <span class="sc">-</span><span class="fl">1.119</span><span class="sc">**</span> <span class="er">|</span>           <span class="sc">-</span><span class="fl">1.119</span><span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.006</span>) <span class="sc">|</span>                  (<span class="fl">0.006</span>) <span class="sc">|</span>            (<span class="fl">0.022</span>) <span class="sc">|</span>            (<span class="fl">0.051</span>) <span class="sc">|</span>            (<span class="fl">0.050</span>) <span class="sc">|</span>            (<span class="fl">0.051</span>) <span class="sc">|</span>            (<span class="fl">0.078</span>) <span class="sc">|</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="er">|</span> lrgdp            <span class="sc">|</span>            <span class="fl">0.916</span><span class="sc">**</span> <span class="er">|</span>                  <span class="fl">0.916</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.916</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.916</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.916</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.916</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.916</span><span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.003</span>) <span class="sc">|</span>                  (<span class="fl">0.003</span>) <span class="sc">|</span>            (<span class="fl">0.010</span>) <span class="sc">|</span>            (<span class="fl">0.024</span>) <span class="sc">|</span>            (<span class="fl">0.028</span>) <span class="sc">|</span>            (<span class="fl">0.024</span>) <span class="sc">|</span>            (<span class="fl">0.043</span>) <span class="sc">|</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="er">|</span> lrgdppc          <span class="sc">|</span>            <span class="fl">0.321</span><span class="sc">**</span> <span class="er">|</span>                  <span class="fl">0.321</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.321</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.321</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.321</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.321</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.321</span><span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.004</span>) <span class="sc">|</span>                  (<span class="fl">0.004</span>) <span class="sc">|</span>            (<span class="fl">0.014</span>) <span class="sc">|</span>            (<span class="fl">0.033</span>) <span class="sc">|</span>            (<span class="fl">0.038</span>) <span class="sc">|</span>            (<span class="fl">0.033</span>) <span class="sc">|</span>            (<span class="fl">0.052</span>) <span class="sc">|</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="er">|</span> regional         <span class="sc">|</span>            <span class="fl">1.199</span><span class="sc">**</span> <span class="er">|</span>                  <span class="fl">1.199</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.199</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.199</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.199</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.199</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.199</span><span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.036</span>) <span class="sc">|</span>                  (<span class="fl">0.029</span>) <span class="sc">|</span>            (<span class="fl">0.106</span>) <span class="sc">|</span>            (<span class="fl">0.222</span>) <span class="sc">|</span>            (<span class="fl">0.185</span>) <span class="sc">|</span>            (<span class="fl">0.222</span>) <span class="sc">|</span>            (<span class="fl">0.333</span>) <span class="sc">|</span></span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="er">|</span> custrict         <span class="sc">|</span>            <span class="fl">1.118</span><span class="sc">**</span> <span class="er">|</span>                  <span class="fl">1.118</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.118</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.118</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.118</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.118</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.118</span><span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.037</span>) <span class="sc">|</span>                  (<span class="fl">0.035</span>) <span class="sc">|</span>            (<span class="fl">0.122</span>) <span class="sc">|</span>            (<span class="fl">0.165</span>) <span class="sc">|</span>            (<span class="fl">0.176</span>) <span class="sc">|</span>            (<span class="fl">0.165</span>) <span class="sc">|</span>            (<span class="fl">0.235</span>) <span class="sc">|</span></span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="er">|</span> comlang          <span class="sc">|</span>            <span class="fl">0.313</span><span class="sc">**</span> <span class="er">|</span>                  <span class="fl">0.313</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.313</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.313</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.313</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.313</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.313</span><span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.011</span>) <span class="sc">|</span>                  (<span class="fl">0.011</span>) <span class="sc">|</span>            (<span class="fl">0.040</span>) <span class="sc">|</span>            (<span class="fl">0.081</span>) <span class="sc">|</span>            (<span class="fl">0.065</span>) <span class="sc">|</span>            (<span class="fl">0.081</span>) <span class="sc">|</span>            (<span class="fl">0.111</span>) <span class="sc">|</span></span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a><span class="er">|</span> border           <span class="sc">|</span>            <span class="fl">0.526</span><span class="sc">**</span> <span class="er">|</span>                  <span class="fl">0.526</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.526</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.526</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.526</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.526</span><span class="sc">**</span> <span class="er">|</span>             <span class="fl">0.526</span><span class="sc">*</span> <span class="er">|</span></span>
+<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.027</span>) <span class="sc">|</span>                  (<span class="fl">0.026</span>) <span class="sc">|</span>            (<span class="fl">0.111</span>) <span class="sc">|</span>            (<span class="fl">0.148</span>) <span class="sc">|</span>            (<span class="fl">0.150</span>) <span class="sc">|</span>            (<span class="fl">0.148</span>) <span class="sc">|</span>            (<span class="fl">0.207</span>) <span class="sc">|</span></span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="er">|</span> landl            <span class="sc">|</span>           <span class="sc">-</span><span class="fl">0.271</span><span class="sc">**</span> <span class="er">|</span>                 <span class="sc">-</span><span class="fl">0.271</span><span class="sc">**</span> <span class="er">|</span>           <span class="sc">-</span><span class="fl">0.271</span><span class="sc">**</span> <span class="er">|</span>           <span class="sc">-</span><span class="fl">0.271</span><span class="sc">**</span> <span class="er">|</span>           <span class="sc">-</span><span class="fl">0.271</span><span class="sc">**</span> <span class="er">|</span>           <span class="sc">-</span><span class="fl">0.271</span><span class="sc">**</span> <span class="er">|</span>            <span class="sc">-</span><span class="fl">0.271</span><span class="sc">*</span> <span class="er">|</span></span>
+<span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.009</span>) <span class="sc">|</span>                  (<span class="fl">0.010</span>) <span class="sc">|</span>            (<span class="fl">0.031</span>) <span class="sc">|</span>            (<span class="fl">0.069</span>) <span class="sc">|</span>            (<span class="fl">0.079</span>) <span class="sc">|</span>            (<span class="fl">0.069</span>) <span class="sc">|</span>            (<span class="fl">0.110</span>) <span class="sc">|</span></span>
+<span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a><span class="er">|</span> island           <span class="sc">|</span>            <span class="fl">0.042</span><span class="sc">**</span> <span class="er">|</span>                  <span class="fl">0.042</span><span class="sc">**</span> <span class="er">|</span>              <span class="fl">0.042</span> <span class="sc">|</span>              <span class="fl">0.042</span> <span class="sc">|</span>              <span class="fl">0.042</span> <span class="sc">|</span>              <span class="fl">0.042</span> <span class="sc">|</span>              <span class="fl">0.042</span> <span class="sc">|</span></span>
+<span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.009</span>) <span class="sc">|</span>                  (<span class="fl">0.009</span>) <span class="sc">|</span>            (<span class="fl">0.036</span>) <span class="sc">|</span>            (<span class="fl">0.105</span>) <span class="sc">|</span>            (<span class="fl">0.083</span>) <span class="sc">|</span>            (<span class="fl">0.105</span>) <span class="sc">|</span>            (<span class="fl">0.154</span>) <span class="sc">|</span></span>
+<span id="cb12-27"><a href="#cb12-27" tabindex="-1"></a><span class="er">|</span> lareap           <span class="sc">|</span>           <span class="sc">-</span><span class="fl">0.097</span><span class="sc">**</span> <span class="er">|</span>                 <span class="sc">-</span><span class="fl">0.097</span><span class="sc">**</span> <span class="er">|</span>           <span class="sc">-</span><span class="fl">0.097</span><span class="sc">**</span> <span class="er">|</span>           <span class="sc">-</span><span class="fl">0.097</span><span class="sc">**</span> <span class="er">|</span>           <span class="sc">-</span><span class="fl">0.097</span><span class="sc">**</span> <span class="er">|</span>           <span class="sc">-</span><span class="fl">0.097</span><span class="sc">**</span> <span class="er">|</span>            <span class="sc">-</span><span class="fl">0.097</span><span class="sc">*</span> <span class="er">|</span></span>
+<span id="cb12-28"><a href="#cb12-28" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.002</span>) <span class="sc">|</span>                  (<span class="fl">0.002</span>) <span class="sc">|</span>            (<span class="fl">0.008</span>) <span class="sc">|</span>            (<span class="fl">0.025</span>) <span class="sc">|</span>            (<span class="fl">0.025</span>) <span class="sc">|</span>            (<span class="fl">0.025</span>) <span class="sc">|</span>            (<span class="fl">0.043</span>) <span class="sc">|</span></span>
+<span id="cb12-29"><a href="#cb12-29" tabindex="-1"></a><span class="er">|</span> comcol           <span class="sc">|</span>            <span class="fl">0.585</span><span class="sc">**</span> <span class="er">|</span>                  <span class="fl">0.585</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.585</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.585</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.585</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.585</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">0.585</span><span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb12-30"><a href="#cb12-30" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.016</span>) <span class="sc">|</span>                  (<span class="fl">0.019</span>) <span class="sc">|</span>            (<span class="fl">0.067</span>) <span class="sc">|</span>            (<span class="fl">0.126</span>) <span class="sc">|</span>            (<span class="fl">0.108</span>) <span class="sc">|</span>            (<span class="fl">0.126</span>) <span class="sc">|</span>            (<span class="fl">0.178</span>) <span class="sc">|</span></span>
+<span id="cb12-31"><a href="#cb12-31" tabindex="-1"></a><span class="er">|</span> curcol           <span class="sc">|</span>            <span class="fl">1.075</span><span class="sc">**</span> <span class="er">|</span>                  <span class="fl">1.075</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.075</span><span class="sc">**</span> <span class="er">|</span>             <span class="fl">1.075</span><span class="sc">*</span> <span class="er">|</span>            <span class="fl">1.075</span><span class="sc">**</span> <span class="er">|</span>             <span class="fl">1.075</span><span class="sc">*</span> <span class="er">|</span>             <span class="fl">1.075</span><span class="sc">*</span> <span class="er">|</span></span>
+<span id="cb12-32"><a href="#cb12-32" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.107</span>) <span class="sc">|</span>                  (<span class="fl">0.070</span>) <span class="sc">|</span>            (<span class="fl">0.235</span>) <span class="sc">|</span>            (<span class="fl">0.462</span>) <span class="sc">|</span>            (<span class="fl">0.256</span>) <span class="sc">|</span>            (<span class="fl">0.462</span>) <span class="sc">|</span>            (<span class="fl">0.480</span>) <span class="sc">|</span></span>
+<span id="cb12-33"><a href="#cb12-33" tabindex="-1"></a><span class="er">|</span> colony           <span class="sc">|</span>            <span class="fl">1.164</span><span class="sc">**</span> <span class="er">|</span>                  <span class="fl">1.164</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.164</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.164</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.164</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.164</span><span class="sc">**</span> <span class="er">|</span>            <span class="fl">1.164</span><span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb12-34"><a href="#cb12-34" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.031</span>) <span class="sc">|</span>                  (<span class="fl">0.023</span>) <span class="sc">|</span>            (<span class="fl">0.117</span>) <span class="sc">|</span>            (<span class="fl">0.193</span>) <span class="sc">|</span>            (<span class="fl">0.115</span>) <span class="sc">|</span>            (<span class="fl">0.193</span>) <span class="sc">|</span>            (<span class="fl">0.209</span>) <span class="sc">|</span></span>
+<span id="cb12-35"><a href="#cb12-35" tabindex="-1"></a><span class="er">|</span> comctry          <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.016</span> <span class="sc">|</span>                   <span class="sc">-</span><span class="fl">0.016</span> <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.016</span> <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.016</span> <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.016</span> <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.016</span> <span class="sc">|</span>             <span class="sc">-</span><span class="fl">0.016</span> <span class="sc">|</span></span>
+<span id="cb12-36"><a href="#cb12-36" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>            (<span class="fl">0.262</span>) <span class="sc">|</span>                  (<span class="fl">0.205</span>) <span class="sc">|</span>            (<span class="fl">1.081</span>) <span class="sc">|</span>            (<span class="fl">0.884</span>) <span class="sc">|</span>            (<span class="fl">1.077</span>) <span class="sc">|</span>            (<span class="fl">0.884</span>) <span class="sc">|</span>            (<span class="fl">0.859</span>) <span class="sc">|</span></span>
+<span id="cb12-37"><a href="#cb12-37" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>                    <span class="er">|</span>                          <span class="er">|</span>                    <span class="er">|</span>                    <span class="er">|</span>                    <span class="er">|</span>                    <span class="er">|</span>                    <span class="er">|</span></span>
+<span id="cb12-38"><a href="#cb12-38" tabindex="-1"></a><span class="er">|</span> Fixed effects    <span class="sc">|</span>                    <span class="er">|</span>                          <span class="er">|</span>                    <span class="er">|</span>                    <span class="er">|</span>                    <span class="er">|</span>                    <span class="er">|</span>                    <span class="er">|</span></span>
+<span id="cb12-39"><a href="#cb12-39" tabindex="-1"></a><span class="er">|</span> year             <span class="sc">|</span>                Yes <span class="sc">|</span>                      Yes <span class="sc">|</span>                Yes <span class="sc">|</span>                Yes <span class="sc">|</span>                Yes <span class="sc">|</span>                Yes <span class="sc">|</span>                Yes <span class="sc">|</span></span>
+<span id="cb12-40"><a href="#cb12-40" tabindex="-1"></a><span class="er">|</span>                  <span class="er">|</span>                    <span class="er">|</span>                          <span class="er">|</span>                    <span class="er">|</span>                    <span class="er">|</span>                    <span class="er">|</span>                    <span class="er">|</span>                    <span class="er">|</span></span>
+<span id="cb12-41"><a href="#cb12-41" tabindex="-1"></a><span class="er">|</span> N                <span class="sc">|</span>            <span class="dv">234</span>,<span class="dv">597</span> <span class="sc">|</span>                  <span class="dv">234</span>,<span class="dv">597</span> <span class="sc">|</span>            <span class="dv">234</span>,<span class="dv">597</span> <span class="sc">|</span>            <span class="dv">234</span>,<span class="dv">597</span> <span class="sc">|</span>            <span class="dv">234</span>,<span class="dv">597</span> <span class="sc">|</span>            <span class="dv">234</span>,<span class="dv">597</span> <span class="sc">|</span>            <span class="dv">234</span>,<span class="dv">597</span> <span class="sc">|</span></span>
+<span id="cb12-42"><a href="#cb12-42" tabindex="-1"></a><span class="er">|</span> R<span class="sc">-</span>squared        <span class="sc">|</span>              <span class="fl">0.648</span> <span class="sc">|</span>                    <span class="fl">0.648</span> <span class="sc">|</span>              <span class="fl">0.648</span> <span class="sc">|</span>              <span class="fl">0.648</span> <span class="sc">|</span>              <span class="fl">0.648</span> <span class="sc">|</span>              <span class="fl">0.648</span> <span class="sc">|</span>              <span class="fl">0.648</span> <span class="sc">|</span></span>
+<span id="cb12-43"><a href="#cb12-43" tabindex="-1"></a><span class="er">|</span> SE type          <span class="sc">|</span>                IID <span class="sc">|</span>   Heteroskedastic<span class="sc">-</span>robust <span class="sc">|</span>     Cluster<span class="sc">-</span>robust <span class="sc">|</span>     Cluster<span class="sc">-</span>robust <span class="sc">|</span>     Cluster<span class="sc">-</span>robust <span class="sc">|</span>     Cluster<span class="sc">-</span>robust <span class="sc">|</span>      Dyadic<span class="sc">-</span>robust <span class="sc">|</span></span>
+<span id="cb12-44"><a href="#cb12-44" tabindex="-1"></a></span>
+<span id="cb12-45"><a href="#cb12-45" tabindex="-1"></a>Standard errors <span class="cf">in</span> parenthesis</span>
+<span id="cb12-46"><a href="#cb12-46" tabindex="-1"></a>Significance levels<span class="sc">:</span> <span class="er">**</span> p <span class="sc">&lt;</span> <span class="fl">0.01</span>; <span class="sc">*</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span>; <span class="sc">+</span> p <span class="sc">&lt;</span> <span class="fl">0.10</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

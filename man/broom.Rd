@@ -25,34 +25,36 @@
 \arguments{
 \item{x}{A fitted model object.}
 
-\item{newdata}{Optional argument to use data different from the data used to
-fit the model.}
+\item{newdata}{Optional argument to use data different from the data used to fit the model.}
 
 \item{...}{Additional arguments passed to the method.}
 
-\item{conf_int}{Logical indicating whether to include the confidence
-interval.}
+\item{conf_int}{Logical indicating whether to include the confidence interval.}
 
 \item{conf_level}{The confidence level for the confidence interval.}
 }
 \value{
-A tibble with the respective information for the \code{augment}, \code{glance},
-and \code{tidy} methods.
+A tibble with the respective information for the \code{augment}, \code{glance}, and \code{tidy} methods.
 }
 \description{
 The provided \code{broom} methods do the following:
 \enumerate{
-\item \code{augment}: Takes the input data and adds additional columns with the
-fitted values and residuals.
-\item \code{glance}: Extracts the deviance, null deviance, and the number of
-observations.`
+\item \code{augment}: Takes the input data and adds additional columns with the fitted values and residuals.
+\item \code{glance}: Extracts the deviance, null deviance, and the number of observations.`
 \item \code{tidy}: Extracts the estimated coefficients and their standard errors.
 }
 }
 \examples{
-mod <- fepoisson(mpg ~ wt | cyl, mtcars)
-broom::augment(mod)
-broom::glance(mod)
-broom::tidy(mod)
+ross2004_subset <- ross2004[ross2004$year == 1999, ]
+ross2004_subset <- ross2004_subset[ross2004_subset$ltrade >
+  quantile(ross2004_subset$ltrade, 0.75), ]
+
+fit <- fepoisson(ltrade ~ ldist, ross2004_subset,
+  control = fit_control(keep_data = TRUE)
+)
+
+broom::augment(fit)
+broom::glance(fit)
+broom::tidy(fit)
 
 }

@@ -1,3 +1,53 @@
+# capybara 2.0.0
+
+* Capybara now offers different variance-covariance estimators that do not require to call `summary()`
+  (e.g., this differens from Alpaca). I added a vignette replicating Cameron and Miller (2014)
+  to show how to use 1-way, 2-way, and dyadic clustering.
+* Improved numerical robustness of convergence criteria across all fitting functions (`fepoisson_asymmetric()`,
+  `feglm_fit()`, `fenegbin_fit()`) to handle FMA (Fused Multiply-Add) compiler optimizations on macOS and ARM.
+  Convergence checks now use hybrid absolute + relative tolerance thresholds that scale appropriately, and
+  bias correction now uses stronger ridge regularization for numerical stability. This eliminates intermittent
+  convergence failures across different platforms and compiler configurations.
+* Besides vcov estimation, capybara now allows to update formulas, which is explained in the vcov
+  vignette. tldr; you can use `fml <- mpg ~ wt | am` followed by
+  `felm(update(fml, . ~ . | cyl), data = mtcars` and variations of (same for `feglm()` and cluster
+  update)
+* I rewrote the the Rank-Revealing Cholesky general method to contribute back to Armadillo.
+* I found an error when using `summary(lm/glm, type = "clustered")` that largely underestimated
+  the standard errors. This is now fixed and I merged "clustered" and " sandwich" types into a single
+  "sandwich" type for clarity and consistency as both use a bread-meat-bread approach.
+* The `InferenceGLM` struct now adds the VCOV matrix and the standard errors to reuse computation and   
+  strealine the summary creation. Same for the `InferenceLM` struct.
+* All the inference (std. error, R-squared, etc) was moved to C++ side and `print()` and `summary()` 
+  functions just format the output.
+* Allows formulas without fixed effects, such as `y ~ x1 + x2` and `y ~ x1 + x2 | 0 | cluster` and 
+  formulas without slopes such as `y ~ 0 | fe1 + fe2`.
+* Allows offsets in GLMs.
+* All the computation is done on C++ side, and now model formulas explicitly fail if there are functions
+  inside them.
+* The default is now `predict(glm_object, type = "response")`, unlike base R behavior.
+* Most of the R and C++ code was refactored to use memory efficiently.
+* Follows fixest-based normalization for fixed effects to match Stata results.
+* Provides the option to use `control = list(centering = "berge")` or `list(centering = "stammann")`. Both
+  methods are equivalent but use different internal logics. Berge's fixed point problem approach is usually
+  faster.
+* Supports Probit and Logit regression.
+* Adds parallelization over columns for an efficient centering regardless of the method used.
+* A new function `fepoisson_asymmetric()` to compare coefficients across expectiles (e.g., 10%, 50%, 90%)
+  to weight positive/negative residuals. This is based on "The Tails of Gravity"
+  (10.1016/j.jinteco.2025.104145). The argument `expectile_glm_iter_max` in `fit_control()` controls the
+  number of inner GLM iterations per APPML step. Setting it to `1L` updates asymmetric weights at every
+  Newton step instead of only after the inner GLM converges, which typically reduces total iterations needed.
+* The `summary_table()` function now accepts positioning arguments for LaTeX.
+* Improved numerical robustness of convergence criteria across all fitting functions (`fepoisson_asymmetric()`,
+  `feglm_fit()`, `fenegbin_fit()`) to handle FMA (Fused Multiply-Add) compiler optimizations on macOS and ARM.
+  Convergence checks now use hybrid absolute + relative tolerance thresholds that scale appropriately,
+  eliminating intermittent convergence failures across different platforms and compiler configurations.
+
+# capybara 1.8.1
+
+* Link to published article and citation info.
+
 # capybara 1.8.0
 
 * Drops congujate gradient acceleration and uses Irons-Tuck acceleration instead. It is slightly 

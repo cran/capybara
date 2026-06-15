@@ -10,7 +10,10 @@ summary_table(
   se_digits = 3,
   stars = TRUE,
   latex = FALSE,
-  model_names = NULL
+  model_names = NULL,
+  caption = NULL,
+  label = NULL,
+  position = "htbp"
 )
 }
 \arguments{
@@ -25,6 +28,13 @@ summary_table(
 \item{latex}{Whether to output as LaTeX code. The default is \code{FALSE}.}
 
 \item{model_names}{Optional vector of custom model names}
+
+\item{caption}{Optional caption for the table (LaTeX only)}
+
+\item{label}{Optional label for cross-referencing (LaTeX only)}
+
+\item{position}{LaTeX float position specifier (LaTeX only). The default is
+\code{"htbp"}.}
 }
 \value{
 A formatted table
@@ -33,7 +43,11 @@ A formatted table
 Generate formatted regression tables
 }
 \examples{
-m1 <- felm(mpg ~ wt | cyl, mtcars)
-m2 <- fepoisson(mpg ~ wt | cyl, mtcars)
+ross2004_subset <- ross2004[ross2004$year == 1999 &
+  ross2004$ltrade > quantile(ross2004$ltrade, 0.75), ]
+
+m1 <- felm(ltrade ~ ldist | ctry1, ross2004_subset)
+m2 <- fepoisson(ltrade ~ ldist | ctry1, ross2004_subset)
+
 summary_table(m1, m2, model_names = c("Linear", "Poisson"))
 }

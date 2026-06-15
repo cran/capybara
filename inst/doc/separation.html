@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Nonexistence of estimates of Poisson models</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Nonexistence of estimates of Poisson
+models</h1>
+
+
+
+<p>This vignette is adapted from <a href="https://github.com/sergiocorreia/ppmlhdfe/blob/master/guides/nonexistence_benchmarks.md#r-packages" class="uri">https://github.com/sergiocorreia/ppmlhdfe/blob/master/guides/nonexistence_benchmarks.md#r-packages</a>.</p>
+<div id="example-1" class="section level2">
+<h2>Example 1</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(capybara)</span></code></pre></div>
+<p>The table below shows a dataset with 12 observations and four
+regressors. Observations 5 is separated because <span class="math inline">\(y=0\)</span> and <span class="math inline">\(z
+\neq x_2 - x_1\)</span> is positive in those observations, and zero
+otherwise.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>correia2019<span class="sc">$</span>example1</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">which</span>(correia2019<span class="sc">$</span>example1<span class="sc">$</span>x2 <span class="sc">-</span> correia2019<span class="sc">$</span>example1<span class="sc">$</span>x1 <span class="sc">!=</span> <span class="dv">0</span> <span class="sc">&amp;</span> correia2019<span class="sc">$</span>example1<span class="sc">$</span>y <span class="sc">==</span> <span class="dv">0</span>)</span></code></pre></div>
+<pre><code># A tibble: 12 × 5
+       y    x1    x2    x3    x4
+   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1     0     0     0     2    10
+ 2     0     0     0     0    -2
+ 3     0     0     0     0     6
+ 4     0     0     0     4     5
+ 5     0     1     0     0     3
+ 6     2     0     0     0     3
+ 7     2     0     0     0     4
+ 8     2     0     0    -2    15
+ 9     2     0     0     0    -7
+10     4     0     0    -3    15
+11     6    -3    -3     0     4
+12     6     0     0     0     4
+[1] 5</code></pre>
+<p>Base R shall not give a warning when estimating a Poisson model on
+this data.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">glm</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">+</span> x3 <span class="sc">+</span> x4,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">data =</span> correia2019<span class="sc">$</span>example1,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisson</span>()</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>Call<span class="sc">:</span>  <span class="fu">glm</span>(<span class="at">formula =</span> y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">+</span> x3 <span class="sc">+</span> x4, <span class="at">family =</span> <span class="fu">poisson</span>(), <span class="at">data =</span> correia2019<span class="sc">$</span>example1)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>Coefficients<span class="sc">:</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>(Intercept)           x1           x2           x3           x4  </span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>    <span class="fl">0.59095</span>    <span class="sc">-</span><span class="fl">17.78017</span>     <span class="fl">17.32952</span>     <span class="sc">-</span><span class="fl">0.47085</span>     <span class="sc">-</span><span class="fl">0.03779</span>  </span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>Degrees of Freedom<span class="sc">:</span> <span class="dv">11</span> <span class="fu">Total</span> (i.e. Null);  <span class="dv">7</span> Residual</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>Null Deviance<span class="sc">:</span>      <span class="fl">31.91</span> </span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>Residual Deviance<span class="sc">:</span> <span class="fl">15.96</span>        AIC<span class="sc">:</span> <span class="fl">46.99</span></span></code></pre></div>
+<p>Capybara will detect separation on this dataset.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">fepoisson</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">+</span> x3 <span class="sc">+</span> x4,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="at">data =</span> correia2019<span class="sc">$</span>example1</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>Separation found <span class="cf">in</span> <span class="dv">1</span> <span class="fu">observation</span>(s)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>Formula<span class="sc">:</span> y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">+</span> x3 <span class="sc">+</span> x4</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>Family<span class="sc">:</span> Poisson</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>Estimates<span class="sc">:</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="er">|</span>             <span class="er">|</span> Estimate <span class="sc">|</span> Std. Error <span class="sc">|</span> z value <span class="sc">|</span> <span class="fu">Pr</span>(<span class="sc">&gt;</span><span class="er">|</span>z<span class="sc">|</span>)  <span class="sc">|</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="er">|</span><span class="sc">-------------</span><span class="er">|</span><span class="sc">----------</span><span class="er">|</span><span class="sc">------------</span><span class="er">|</span><span class="sc">---------</span><span class="er">|</span><span class="sc">-----------</span><span class="er">|</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="er">|</span> (Intercept) <span class="sc">|</span>   <span class="fl">0.5910</span> <span class="sc">|</span>     <span class="fl">0.3029</span> <span class="sc">|</span>  <span class="fl">1.9510</span> <span class="sc">|</span> <span class="fl">0.0511</span> <span class="sc">+</span>  <span class="er">|</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="er">|</span> x1          <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.4507</span> <span class="sc">|</span>     <span class="fl">0.1648</span> <span class="sc">|</span> <span class="sc">-</span><span class="fl">2.7352</span> <span class="sc">|</span> <span class="fl">0.0062</span> <span class="sc">**</span> <span class="er">|</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="er">|</span> x2          <span class="sc">|</span>       <span class="cn">NA</span> <span class="sc">|</span>         <span class="cn">NA</span> <span class="sc">|</span>      <span class="cn">NA</span> <span class="sc">|</span> <span class="cn">NA</span>        <span class="sc">|</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="er">|</span> x3          <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.4708</span> <span class="sc">|</span>     <span class="fl">0.2311</span> <span class="sc">|</span> <span class="sc">-</span><span class="fl">2.0367</span> <span class="sc">|</span> <span class="fl">0.0417</span> <span class="sc">*</span>  <span class="er">|</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="er">|</span> x4          <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.0378</span> <span class="sc">|</span>     <span class="fl">0.0438</span> <span class="sc">|</span> <span class="sc">-</span><span class="fl">0.8634</span> <span class="sc">|</span> <span class="fl">0.3879</span>    <span class="sc">|</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>Significance codes<span class="sc">:</span> <span class="er">**</span> p <span class="sc">&lt;</span> <span class="fl">0.01</span>; <span class="sc">*</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span>; <span class="sc">+</span> p <span class="sc">&lt;</span> <span class="fl">0.10</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>Pseudo R<span class="sc">-</span>squared<span class="sc">:</span> <span class="fl">0.4813</span> </span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>Number of observations<span class="sc">:</span> Full <span class="dv">12</span>; Separated <span class="dv">1</span>; Perfect classification <span class="dv">0</span> </span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>Number of Fisher Scoring iterations<span class="sc">:</span> <span class="dv">5</span></span></code></pre></div>
+</div>
+<div id="example-2" class="section level2">
+<h2>Example 2</h2>
+<p>The table below shows a different dataset with 12 observations and
+four regressors. Observations 2, 3, 6, 7 and 8 are separated because
+<span class="math inline">\(y=0\)</span> and <span class="math inline">\(z &gt; x_2 - x_1\)</span> is positive in those
+observations, and zero otherwise.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>correia2019<span class="sc">$</span>example2</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">which</span>(correia2019<span class="sc">$</span>example2<span class="sc">$</span>x2 <span class="sc">-</span> correia2019<span class="sc">$</span>example2<span class="sc">$</span>x1 <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> correia2019<span class="sc">$</span>example2<span class="sc">$</span>y <span class="sc">==</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># A tibble: 12 × 5</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>       y    x1    x2    x3    x4</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>   <span class="sc">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>dbl<span class="sc">&gt;</span> <span class="er">&lt;</span>dbl<span class="sc">&gt;</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a> <span class="dv">1</span>     <span class="dv">0</span>    <span class="dv">14</span>     <span class="dv">4</span>     <span class="dv">0</span>   <span class="sc">-</span><span class="dv">12</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a> <span class="dv">2</span>     <span class="dv">0</span>     <span class="dv">0</span>    <span class="dv">35</span>    <span class="dv">34</span>    <span class="dv">12</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a> <span class="dv">3</span>     <span class="dv">0</span>     <span class="dv">0</span>     <span class="dv">3</span>     <span class="dv">0</span>    <span class="dv">17</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a> <span class="dv">4</span>     <span class="dv">0</span>     <span class="dv">0</span>     <span class="dv">0</span>     <span class="dv">0</span>     <span class="dv">1</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a> <span class="dv">5</span>     <span class="dv">0</span>     <span class="dv">0</span>     <span class="dv">0</span>    <span class="sc">-</span><span class="dv">2</span>     <span class="dv">7</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a> <span class="dv">6</span>     <span class="dv">0</span>     <span class="dv">0</span>    <span class="dv">25</span>     <span class="dv">0</span>    <span class="dv">12</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a> <span class="dv">7</span>     <span class="dv">0</span>     <span class="dv">0</span>    <span class="dv">13</span>     <span class="dv">0</span>    <span class="dv">60</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a> <span class="dv">8</span>     <span class="dv">0</span>     <span class="dv">0</span>    <span class="dv">15</span>     <span class="dv">0</span>     <span class="dv">7</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a> <span class="dv">9</span>     <span class="dv">0</span>     <span class="dv">1</span>     <span class="dv">0</span>     <span class="dv">7</span>   <span class="sc">-</span><span class="dv">24</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="dv">10</span>     <span class="dv">9</span>     <span class="dv">0</span>     <span class="dv">0</span>     <span class="dv">0</span>    <span class="dv">18</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="dv">11</span>     <span class="dv">4</span>     <span class="dv">2</span>     <span class="dv">0</span>     <span class="dv">6</span>    <span class="sc">-</span><span class="dv">1</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="dv">12</span>     <span class="dv">2</span>     <span class="dv">1</span>     <span class="dv">0</span>     <span class="dv">0</span>    <span class="sc">-</span><span class="dv">7</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>[<span class="dv">1</span>] <span class="dv">2</span> <span class="dv">3</span> <span class="dv">6</span> <span class="dv">7</span> <span class="dv">8</span></span></code></pre></div>
+<p>Base R shall give a convergence warning when estimating a Poisson
+model on this data.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">glm</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">+</span> x3 <span class="sc">+</span> x4,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">data =</span> correia2019<span class="sc">$</span>example2,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisson</span>()</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>Call:  glm(formula = y ~ x1 + x2 + x3 + x4, family = poisson(), data = correia2019$example2)
+
+Coefficients:
+(Intercept)           x1           x2           x3           x4  
+    -367.83       512.42     -1644.86      -105.85        20.56  
+
+Degrees of Freedom: 11 Total (i.e. Null);  7 Residual
+Null Deviance:      46.72 
+Residual Deviance: 9.672e-06    AIC: 19.93
+Warning messages:
+1: glm.fit: algorithm did not converge 
+2: glm.fit: fitted rates numerically 0 occurred</code></pre>
+<p>Capybara will detect separation on this dataset.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">fepoisson</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">+</span> x3 <span class="sc">+</span> x4,</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="at">data =</span> correia2019<span class="sc">$</span>example2</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>Separation found <span class="cf">in</span> <span class="dv">6</span> <span class="fu">observation</span>(s)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>Formula<span class="sc">:</span> y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">+</span> x3 <span class="sc">+</span> x4</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>Family<span class="sc">:</span> Poisson</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>Estimates<span class="sc">:</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="er">|</span>             <span class="er">|</span> Estimate  <span class="sc">|</span> Std. Error <span class="sc">|</span> z value <span class="sc">|</span> <span class="fu">Pr</span>(<span class="sc">&gt;</span><span class="er">|</span>z<span class="sc">|</span>) <span class="sc">|</span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="er">|</span><span class="sc">-------------</span><span class="er">|</span><span class="sc">-----------</span><span class="er">|</span><span class="sc">------------</span><span class="er">|</span><span class="sc">---------</span><span class="er">|</span><span class="sc">----------</span><span class="er">|</span></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="er">|</span> (Intercept) <span class="sc">|</span> <span class="sc">-</span><span class="fl">239.2049</span> <span class="sc">|</span>  <span class="fl">1134.4711</span> <span class="sc">|</span> <span class="sc">-</span><span class="fl">0.2109</span> <span class="sc">|</span>   <span class="fl">0.8330</span> <span class="sc">|</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="er">|</span> x1          <span class="sc">|</span>  <span class="fl">333.7767</span> <span class="sc">|</span>  <span class="fl">1575.6630</span> <span class="sc">|</span>  <span class="fl">0.2118</span> <span class="sc">|</span>   <span class="fl">0.8322</span> <span class="sc">|</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="er">|</span> x2          <span class="sc">|</span>        <span class="cn">NA</span> <span class="sc">|</span>         <span class="cn">NA</span> <span class="sc">|</span>      <span class="cn">NA</span> <span class="sc">|</span>   <span class="cn">NA</span>     <span class="sc">|</span></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="er">|</span> x3          <span class="sc">|</span>  <span class="sc">-</span><span class="fl">68.9251</span> <span class="sc">|</span>   <span class="fl">325.6385</span> <span class="sc">|</span> <span class="sc">-</span><span class="fl">0.2117</span> <span class="sc">|</span>   <span class="fl">0.8324</span> <span class="sc">|</span></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="er">|</span> x4          <span class="sc">|</span>   <span class="fl">13.4112</span> <span class="sc">|</span>    <span class="fl">63.0263</span> <span class="sc">|</span>  <span class="fl">0.2128</span> <span class="sc">|</span>   <span class="fl">0.8315</span> <span class="sc">|</span></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a>Significance codes<span class="sc">:</span> <span class="er">**</span> p <span class="sc">&lt;</span> <span class="fl">0.01</span>; <span class="sc">*</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span>; <span class="sc">+</span> p <span class="sc">&lt;</span> <span class="fl">0.10</span></span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a>Pseudo R<span class="sc">-</span>squared<span class="sc">:</span> <span class="fl">1.00</span> </span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a></span>
+<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a>Number of observations<span class="sc">:</span> Full <span class="dv">12</span>; Separated <span class="dv">6</span>; Perfect classification <span class="dv">0</span> </span>
+<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a>Number of Fisher Scoring iterations<span class="sc">:</span> <span class="dv">25</span></span></code></pre></div>
+</div>
+<div id="example-3-fixed-effects" class="section level2">
+<h2>Example 3 (fixed effects)</h2>
+<p>Base R shall not give a warning when estimating a Poisson model with
+fixed effects on the dataset below. The separation in this case is less
+clear, which motivates why capybara uses linear programming to detect
+separation in Poisson models.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>correia2019<span class="sc">$</span>fe1</span></code></pre></div>
+<pre><code># A tibble: 18 × 5
+       y    x1    x2     i     j
+   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1     2     0     0     2     1
+ 2     0     0     0     4     2
+ 3     0     0     0     1     1
+ 4     1     1     0     4     3
+ 5     0     0     1     2     2
+ 6     0     0     0     2     2
+ 7     1     0     0     5     4
+ 8     0     1     2     2     3
+ 9     1     0     0     1     1
+10     0     0     0     2     2
+11     0     2     0     1     3
+12     0     0     0     1     3
+13     0     1     0     2     2
+14     0     0     1     5     2
+15     0     0     1     2     4
+16     0     0     0     1     2
+17     0     0     0     1     1
+18     2     0     0     1     2</code></pre>
+<p>Base R shall not give a warning when estimating a Poisson model with
+fixed effects on this data.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">glm</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>  y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">+</span> <span class="fu">factor</span>(i) <span class="sc">+</span> <span class="fu">factor</span>(j),</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="at">data =</span> correia2019<span class="sc">$</span>fe1,</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisson</span>()</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>Call<span class="sc">:</span>  <span class="fu">glm</span>(<span class="at">formula =</span> y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">+</span> <span class="fu">factor</span>(i) <span class="sc">+</span> <span class="fu">factor</span>(j), <span class="at">family =</span> <span class="fu">poisson</span>(), </span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>    <span class="at">data =</span> correia2019<span class="sc">$</span>fe1)</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>Coefficients<span class="sc">:</span></span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>(Intercept)           x1           x2   <span class="fu">factor</span>(i)<span class="dv">2</span>   <span class="fu">factor</span>(i)<span class="dv">4</span>   <span class="fu">factor</span>(i)<span class="dv">5</span>  </span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>    <span class="sc">-</span><span class="fl">0.4114</span>      <span class="sc">-</span><span class="fl">0.4845</span>     <span class="sc">-</span><span class="fl">18.5226</span>       <span class="fl">0.4233</span>       <span class="fl">0.7375</span>       <span class="fl">0.9101</span>  </span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a> <span class="fu">factor</span>(j)<span class="dv">2</span>   <span class="fu">factor</span>(j)<span class="dv">3</span>   <span class="fu">factor</span>(j)<span class="dv">4</span>  </span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>    <span class="sc">-</span><span class="fl">0.9854</span>      <span class="sc">-</span><span class="fl">0.5696</span>      <span class="sc">-</span><span class="fl">0.4986</span>  </span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>Degrees of Freedom<span class="sc">:</span> <span class="dv">17</span> <span class="fu">Total</span> (i.e. Null);  <span class="dv">9</span> Residual</span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a>Null Deviance<span class="sc">:</span>      <span class="fl">18.77</span> </span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a>Residual Deviance<span class="sc">:</span> <span class="fl">13.36</span>        AIC<span class="sc">:</span> <span class="fl">42.59</span></span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a>Warning message<span class="sc">:</span></span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a>glm.fit<span class="sc">:</span> fitted rates numerically <span class="dv">0</span> occurred</span></code></pre></div>
+<p>Capybara will detect separation when estimating Poisson models.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">fepoisson</span>(</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>  y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">|</span> i <span class="sc">+</span> j,</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>  <span class="at">data =</span> correia2019<span class="sc">$</span>fe1</span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>Separation found in 4 observation(s)
+Formula: y ~ x1 + x2 | i + j
+
+Family: Poisson
+
+Estimates:
+
+|    | Estimate | Std. Error | z value | Pr(&gt;|z|) |
+|----|----------|------------|---------|----------|
+| x1 |  -0.4811 |     1.2419 | -0.3874 |   0.6984 |
+| x2 |       NA |         NA |      NA |   NA     |
+
+Significance codes: ** p &lt; 0.01; * p &lt; 0.05; + p &lt; 0.10
+
+Pseudo R-squared: 0.1874 
+
+Fixed effects:
+  i: 4
+  j: 4
+
+Number of observations: Full 18; Separated 4; Perfect classification 0 
+
+Number of Fisher Scoring iterations: 4</code></pre>
+<p>‘correia2019’ (Stata) will also detect separation when estimating
+Poisson models with fixed effects.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode stata"><code class="sourceCode stata"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>. correia2019 <span class="fu">y</span> x1 <span class="kw">x2</span>, a(i j)</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>(simplex method dropped 4 separated observations)</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>(dropped 1 singleton observations)</span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a><span class="kw">note</span>: 1 <span class="kw">variable</span> omitted because <span class="kw">of</span> collinearity: <span class="kw">x2</span></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a> $$ Stopping (no negative residuals); separation found <span class="kw">in</span> 0 observations (1 iterations and 732 subiterations)</span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>Iteration 1:   deviance = 1.4149e+01  eps = .         iters = 4    tol = 1.0e-04                                                                            </span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a>...</span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a>Iteration 6:   deviance = 1.3364e+01  eps = 1.85e-16  iters = 3    tol = 1.0e-07                                                                            </span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>-------------------------------------------------------------------------------</span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a>(<span class="bn">legend</span>: <span class="kw">p</span>: exact partial-out   <span class="fu">s</span>: exact solver   <span class="kw">h</span>: step-halving   o: epsilon </span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a>&gt; below <span class="kw">tolerance</span>)</span>
+<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a>Converged <span class="kw">in</span> 6 iterations and 21 HDFE sub-iterations (tol = 1.0e-08)</span>
+<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a>HDFE PPML regression                              No. <span class="kw">of</span> <span class="kw">obs</span>      =         13</span>
+<span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a>Absorbing 2 HDFE groups                           Residual df     =          7</span>
+<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a>                                                  Wald <span class="fu">chi2</span>(1)    =       0.53</span>
+<span id="cb20-17"><a href="#cb20-17" tabindex="-1"></a>Deviance             =  13.36443052               Prob &gt; <span class="fu">chi2</span>     =     0.4686</span>
+<span id="cb20-18"><a href="#cb20-18" tabindex="-1"></a>Log pseudolikelihood =  -11.2959209               Pseudo R2       =     0.0607</span>
+<span id="cb20-19"><a href="#cb20-19" tabindex="-1"></a>------------------------------------------------------------------------------</span>
+<span id="cb20-20"><a href="#cb20-20" tabindex="-1"></a>             |               Robust</span>
+<span id="cb20-21"><a href="#cb20-21" tabindex="-1"></a>           <span class="fu">y</span> |      Coef.   Std. Err.      z    P&gt;|z|     [95% Conf. Interval]</span>
+<span id="cb20-22"><a href="#cb20-22" tabindex="-1"></a>-------------+----------------------------------------------------------------</span>
+<span id="cb20-23"><a href="#cb20-23" tabindex="-1"></a>          x1 |  -.4845469   .6685201    -0.72   0.469    -1.794822    .8257284</span>
+<span id="cb20-24"><a href="#cb20-24" tabindex="-1"></a>          <span class="kw">x2</span> |          0  (omitted)</span>
+<span id="cb20-25"><a href="#cb20-25" tabindex="-1"></a>       <span class="dt">_cons</span> |  -.5708466   .4604099    -1.24   0.215    -1.473233    .3315402</span>
+<span id="cb20-26"><a href="#cb20-26" tabindex="-1"></a>------------------------------------------------------------------------------</span>
+<span id="cb20-27"><a href="#cb20-27" tabindex="-1"></a></span>
+<span id="cb20-28"><a href="#cb20-28" tabindex="-1"></a>Absorbed degrees <span class="kw">of</span> freedom:</span>
+<span id="cb20-29"><a href="#cb20-29" tabindex="-1"></a>-----------------------------------------------------+</span>
+<span id="cb20-30"><a href="#cb20-30" tabindex="-1"></a> Absorbed FE | Categories  - Redundant  = Num. Coefs |</span>
+<span id="cb20-31"><a href="#cb20-31" tabindex="-1"></a>-------------+---------------------------------------|</span>
+<span id="cb20-32"><a href="#cb20-32" tabindex="-1"></a>           i |         3           0           3     |</span>
+<span id="cb20-33"><a href="#cb20-33" tabindex="-1"></a>           j |         3           1           2     |</span>
+<span id="cb20-34"><a href="#cb20-34" tabindex="-1"></a>-----------------------------------------------------+</span></code></pre></div>
+<p>A difference with respect to Stata’s ‘correia2019’ is that capybara
+requires an explicit cluster term in the formula to compute robust
+standard errors using a sandwich operation.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>correia2019<span class="sc">$</span>fe1<span class="sc">$</span>pair <span class="ot">&lt;-</span> <span class="fu">paste0</span>(correia2019<span class="sc">$</span>fe1<span class="sc">$</span>i, correia2019<span class="sc">$</span>fe1<span class="sc">$</span>j)</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a><span class="fu">fepoisson</span>(</span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>  y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">|</span> i <span class="sc">+</span> j <span class="sc">|</span> pair,</span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a>  <span class="at">data =</span> correia2019<span class="sc">$</span>fe1</span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>Separation found <span class="cf">in</span> <span class="dv">4</span> <span class="fu">observation</span>(s)</span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>Formula<span class="sc">:</span> y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">|</span> i <span class="sc">+</span> j <span class="sc">|</span> pair</span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>Family<span class="sc">:</span> Poisson</span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a>Estimates<span class="sc">:</span></span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a><span class="er">|</span>    <span class="er">|</span> Estimate <span class="sc">|</span> Std. Error <span class="sc">|</span> z value <span class="sc">|</span> <span class="fu">Pr</span>(<span class="sc">&gt;</span><span class="er">|</span>z<span class="sc">|</span>) <span class="sc">|</span></span>
+<span id="cb22-9"><a href="#cb22-9" tabindex="-1"></a><span class="er">|</span><span class="sc">----</span><span class="er">|</span><span class="sc">----------</span><span class="er">|</span><span class="sc">------------</span><span class="er">|</span><span class="sc">---------</span><span class="er">|</span><span class="sc">----------</span><span class="er">|</span></span>
+<span id="cb22-10"><a href="#cb22-10" tabindex="-1"></a><span class="er">|</span> x1 <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.4811</span> <span class="sc">|</span>     <span class="fl">0.3101</span> <span class="sc">|</span> <span class="sc">-</span><span class="fl">1.5514</span> <span class="sc">|</span>   <span class="fl">0.1208</span> <span class="sc">|</span></span>
+<span id="cb22-11"><a href="#cb22-11" tabindex="-1"></a><span class="er">|</span> x2 <span class="sc">|</span>       <span class="cn">NA</span> <span class="sc">|</span>         <span class="cn">NA</span> <span class="sc">|</span>      <span class="cn">NA</span> <span class="sc">|</span>   <span class="cn">NA</span>     <span class="sc">|</span></span>
+<span id="cb22-12"><a href="#cb22-12" tabindex="-1"></a></span>
+<span id="cb22-13"><a href="#cb22-13" tabindex="-1"></a>Significance codes<span class="sc">:</span> <span class="er">**</span> p <span class="sc">&lt;</span> <span class="fl">0.01</span>; <span class="sc">*</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span>; <span class="sc">+</span> p <span class="sc">&lt;</span> <span class="fl">0.10</span></span>
+<span id="cb22-14"><a href="#cb22-14" tabindex="-1"></a></span>
+<span id="cb22-15"><a href="#cb22-15" tabindex="-1"></a>Pseudo R<span class="sc">-</span>squared<span class="sc">:</span> <span class="fl">0.1874</span> </span>
+<span id="cb22-16"><a href="#cb22-16" tabindex="-1"></a></span>
+<span id="cb22-17"><a href="#cb22-17" tabindex="-1"></a>Fixed effects<span class="sc">:</span></span>
+<span id="cb22-18"><a href="#cb22-18" tabindex="-1"></a>  i<span class="sc">:</span> <span class="dv">4</span></span>
+<span id="cb22-19"><a href="#cb22-19" tabindex="-1"></a>  j<span class="sc">:</span> <span class="dv">4</span></span>
+<span id="cb22-20"><a href="#cb22-20" tabindex="-1"></a></span>
+<span id="cb22-21"><a href="#cb22-21" tabindex="-1"></a>Number of observations<span class="sc">:</span> Full <span class="dv">18</span>; Separated <span class="dv">4</span>; Perfect classification <span class="dv">0</span> </span>
+<span id="cb22-22"><a href="#cb22-22" tabindex="-1"></a></span>
+<span id="cb22-23"><a href="#cb22-23" tabindex="-1"></a>Number of Fisher Scoring iterations<span class="sc">:</span> <span class="dv">4</span></span></code></pre></div>
+<p>Other R packages may not detect separation in Poisson models with
+fixed effects. By disabling the separation check in Capybara, we can
+match ‘alpaca’ and ‘fixest’ results.</p>
+<p>Capybara without checking separation (incorrect <span class="math inline">\(\beta_2\)</span>):</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="fu">fepoisson</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>  y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">|</span> i <span class="sc">+</span> j,</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>  <span class="at">data =</span> correia2019<span class="sc">$</span>fe1,</span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">list</span>(<span class="at">check_separation =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>Formula<span class="sc">:</span> y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">|</span> i <span class="sc">+</span> j</span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>Family<span class="sc">:</span> Poisson</span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a>Estimates<span class="sc">:</span></span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a><span class="er">|</span>    <span class="er">|</span> Estimate <span class="sc">|</span> Std. Error <span class="sc">|</span> z value <span class="sc">|</span> <span class="fu">Pr</span>(<span class="sc">&gt;</span><span class="er">|</span>z<span class="sc">|</span>) <span class="sc">|</span></span>
+<span id="cb24-8"><a href="#cb24-8" tabindex="-1"></a><span class="er">|</span><span class="sc">----</span><span class="er">|</span><span class="sc">----------</span><span class="er">|</span><span class="sc">------------</span><span class="er">|</span><span class="sc">---------</span><span class="er">|</span><span class="sc">----------</span><span class="er">|</span></span>
+<span id="cb24-9"><a href="#cb24-9" tabindex="-1"></a><span class="er">|</span> x1 <span class="sc">|</span>  <span class="sc">-</span><span class="fl">0.4845</span> <span class="sc">|</span>     <span class="fl">1.2439</span> <span class="sc">|</span> <span class="sc">-</span><span class="fl">0.3895</span> <span class="sc">|</span>   <span class="fl">0.6969</span> <span class="sc">|</span></span>
+<span id="cb24-10"><a href="#cb24-10" tabindex="-1"></a><span class="er">|</span> x2 <span class="sc">|</span> <span class="sc">-</span><span class="fl">12.3711</span> <span class="sc">|</span>   <span class="fl">383.1463</span> <span class="sc">|</span> <span class="sc">-</span><span class="fl">0.0323</span> <span class="sc">|</span>   <span class="fl">0.9742</span> <span class="sc">|</span></span>
+<span id="cb24-11"><a href="#cb24-11" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" tabindex="-1"></a>Significance codes<span class="sc">:</span> <span class="er">**</span> p <span class="sc">&lt;</span> <span class="fl">0.01</span>; <span class="sc">*</span> p <span class="sc">&lt;</span> <span class="fl">0.05</span>; <span class="sc">+</span> p <span class="sc">&lt;</span> <span class="fl">0.10</span></span>
+<span id="cb24-13"><a href="#cb24-13" tabindex="-1"></a></span>
+<span id="cb24-14"><a href="#cb24-14" tabindex="-1"></a>Pseudo R<span class="sc">-</span>squared<span class="sc">:</span> <span class="fl">0.2614</span> </span>
+<span id="cb24-15"><a href="#cb24-15" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" tabindex="-1"></a>Fixed effects<span class="sc">:</span></span>
+<span id="cb24-17"><a href="#cb24-17" tabindex="-1"></a>  i<span class="sc">:</span> <span class="dv">4</span></span>
+<span id="cb24-18"><a href="#cb24-18" tabindex="-1"></a>  j<span class="sc">:</span> <span class="dv">4</span></span>
+<span id="cb24-19"><a href="#cb24-19" tabindex="-1"></a></span>
+<span id="cb24-20"><a href="#cb24-20" tabindex="-1"></a>Number of observations<span class="sc">:</span> Full <span class="dv">18</span>; Missing <span class="dv">0</span>; Perfect classification <span class="dv">0</span> </span>
+<span id="cb24-21"><a href="#cb24-21" tabindex="-1"></a></span>
+<span id="cb24-22"><a href="#cb24-22" tabindex="-1"></a>Number of Fisher Scoring iterations<span class="sc">:</span> <span class="dv">14</span></span></code></pre></div>
+<p>Alpaca:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>alpaca<span class="sc">::</span><span class="fu">feglm</span>(</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>  y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">|</span> i <span class="sc">+</span> j,</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>  <span class="at">data =</span> correia2019<span class="sc">$</span>fe1,</span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisson</span>()</span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>poisson <span class="sc">-</span> log link, l<span class="ot">=</span> [<span class="dv">4</span>, <span class="dv">4</span>]</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>      x1       x2 </span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a> <span class="sc">-</span><span class="fl">0.4845</span> <span class="sc">-</span><span class="fl">17.3711</span> </span></code></pre></div>
+<p>Fixest:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a>fixest<span class="sc">::</span><span class="fu">feglm</span>(</span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a>  y <span class="sc">~</span> x1 <span class="sc">+</span> x2 <span class="sc">|</span> i <span class="sc">+</span> j,</span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a>  <span class="at">data =</span> correia2019<span class="sc">$</span>fe1,</span>
+<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisson</span>()</span>
+<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>GLM estimation, family <span class="ot">=</span> poisson, Dep. Var.<span class="sc">:</span> y</span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a>Observations<span class="sc">:</span> <span class="dv">18</span></span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a>Fixed<span class="sc">-</span>effects<span class="sc">:</span> i<span class="sc">:</span> <span class="dv">4</span>,  j<span class="sc">:</span> <span class="dv">4</span></span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a>Standard<span class="sc">-</span>errors<span class="sc">:</span> IID </span>
+<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a>     Estimate Std. Error   z value <span class="fu">Pr</span>(<span class="sc">&gt;</span><span class="er">|</span>z<span class="sc">|</span>) </span>
+<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a>x1  <span class="sc">-</span><span class="fl">0.484547</span>    <span class="fl">1.70957</span> <span class="sc">-</span><span class="fl">0.283432</span>  <span class="fl">0.77685</span> </span>
+<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a>x2 <span class="sc">-</span><span class="fl">18.514805</span> <span class="fl">6880.80328</span> <span class="sc">-</span><span class="fl">0.002691</span>  <span class="fl">0.99785</span> </span>
+<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a><span class="sc">---</span></span>
+<span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a>Signif. codes<span class="sc">:</span>  <span class="dv">0</span> <span class="st">&#39;***&#39;</span> <span class="fl">0.001</span> <span class="st">&#39;**&#39;</span> <span class="fl">0.01</span> <span class="st">&#39;*&#39;</span> <span class="fl">0.05</span> <span class="st">&#39;.&#39;</span> <span class="fl">0.1</span> <span class="st">&#39; &#39;</span> <span class="dv">1</span></span>
+<span id="cb28-10"><a href="#cb28-10" tabindex="-1"></a>Log<span class="sc">-</span>Likelihood<span class="sc">:</span> <span class="sc">-</span><span class="fl">12.3</span>   Adj. Pseudo R2<span class="sc">:</span> <span class="sc">-</span><span class="fl">0.353285</span></span>
+<span id="cb28-11"><a href="#cb28-11" tabindex="-1"></a>           BIC<span class="sc">:</span>  <span class="fl">50.6</span>     Squared Cor.<span class="sc">:</span>  <span class="fl">0.261426</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -4,38 +4,42 @@
 \alias{vcov.felm}
 \title{Covariance matrix for LMs}
 \usage{
-\method{vcov}{felm}(
-  object,
-  type = c("hessian", "outer.product", "sandwich", "clustered"),
-  ...
-)
+\method{vcov}{felm}(object, ...)
 }
 \arguments{
 \item{object}{an object of class \code{"felm"}.}
 
-\item{type}{the type of covariance estimate required. \code{"hessian"} refers
-to the inverse of the negative expected hessian after convergence and is the
-default option. \code{"outer.product"} is the outer-product-of-the-gradient
-estimator. \code{"sandwich"} is the sandwich estimator (sometimes also
-referred as robust estimator), and \code{"clustered"} computes a clustered
-covariance matrix given some cluster variables.}
-
-\item{...}{additional arguments.}
+\item{...}{additional arguments (currently ignored).}
 }
 \value{
 A named matrix of covariance estimates.
 }
 \description{
-Covariance matrix for the estimator of the structural parameters
-from objects returned by \code{\link{felm}}. The covariance is computed
-from the hessian, the scores, or a combination of both after convergence.
+Covariance matrix for the estimator of the structural parameters from objects returned by \link{felm}.
+The covariance is computed during model fitting - either the inverse Hessian (default) or the sandwich estimator if
+cluster variables are specified in the formula.
 }
 \examples{
-# same as the example in felm but extracting the covariance matrix
-mod <- felm(log(mpg) ~ log(wt) | cyl | am, mtcars)
-vcov(mod, type = "clustered")
+# Model with clustering - returns sandwich covariance
+ross2004_s1 <- ross2004[ross2004$year == 1994, ]
+ross2004_s1 <- ross2004_s1[ross2004_s1$ltrade >
+  quantile(ross2004_s1$ltrade, 0.75), ]
+
+ross2004_s2 <- ross2004[ross2004$year == 1999, ]
+ross2004_s2 <- ross2004_s2[ross2004_s2$ltrade >
+  quantile(ross2004_s2$ltrade, 0.75), ]
+
+ross2004_subset <- rbind(ross2004_s1, ross2004_s2)
+
+fit <- felm(ltrade ~ ldist | ctry1 | year, ross2004_subset)
+
+vcov(fit)
 
 }
+\references{
+Cameron, C., J. Gelbach, and D. Miller (2011). "Robust Inference With Multiway Clustering". Journal of
+Business & Economic Statistics 29(2).
+}
 \seealso{
-\code{\link{felm}}
+\link{felm}
 }

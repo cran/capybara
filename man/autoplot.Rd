@@ -12,28 +12,35 @@
 \arguments{
 \item{object}{A fitted model object.}
 
-\item{...}{Additional arguments passed to the method. In this case,
-the additional argument is \code{conf_level}, which is the confidence level for
-the confidence interval.}
+\item{...}{Additional arguments passed to the method. In this case, the additional argument is \code{conf_level}, which is
+the confidence level for the confidence interval.}
 }
 \value{
-A ggplot object with the estimated coefficients and their confidence
-intervals.
+A ggplot object with the estimated coefficients and their confidence intervals.
 
-A ggplot object with the estimated coefficients and their confidence
-intervals.
+A ggplot object with the estimated coefficients and their confidence intervals.
 }
 \description{
 Extracts the estimated coefficients and their confidence
 intervals.
 
-Extracts the estimated coefficients and their confidence
+Extracts the estimated coefficients and their confidence intervals.
 }
 \examples{
-mod <- fepoisson(mpg ~ wt + drat | cyl, mtcars)
-autoplot(mod, conf_level = 0.99)
+ross2004_subset <- ross2004[ross2004$year == 1999, ]
+ross2004_subset <- ross2004_subset[ross2004_subset$ltrade >
+  quantile(ross2004_subset$ltrade, 0.75), ]
 
-mod <- felm(mpg ~ wt + drat | cyl, mtcars)
-autoplot(mod, conf_level = 0.90)
+fit <- fepoisson(ltrade ~ ldist | ctry1, ross2004_subset)
+
+autoplot(fit, conf_level = 0.99)
+
+ross2004_subset <- ross2004[ross2004$year == 1999, ]
+ross2004_subset <- ross2004_subset[ross2004_subset$ltrade >
+  quantile(ross2004_subset$ltrade, 0.75), ]
+
+fit <- felm(ltrade ~ ldist | ctry1, ross2004_subset)
+
+autoplot(fit, conf_level = 0.99)
 
 }
