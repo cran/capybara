@@ -34,6 +34,7 @@ Authors:
 Other contributors:
 \itemize{
   \item Joao Santos Silva [thesis advisor]
+  \item Julian Costas Fernandez [contributor]
   \item Yoto Yotov [contributor]
 }
 

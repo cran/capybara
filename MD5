@@ -1,6 +1,6 @@
-161d7f950ccc70e52b8cc500354875c6 *DESCRIPTION
+13ed751b2297375d870b99cd412744a6 *DESCRIPTION
 0eff561ec0d3da986fb67e2592c634f6 *NAMESPACE
-956aa1f654ddc6517d3e9d926317517d *NEWS.md
+53264469e2f77302bd00f0635a925a00 *NEWS.md
 1113017c461a983fe07b76a065b5e0a1 *R/autoplot.R
 0521abb5c1066c5f99d096951a4d6807 *R/capybara-package.R
 5019cd1b29d1c0c8707102b7d09db490 *R/cpp4r.R
@@ -37,8 +37,8 @@ a4d8a871cddece7085a991df5b2cab4e *inst/CITATION
 cc82bf169034b6ce3d75e128270e9f8d *inst/Makevars.example
 fa96bf234f9448dad8e91cd5cceaa0f3 *inst/WORDLIST
 5e270ae6034b339c2a13d20a5f7d2dec *inst/doc/asymmetric.R
-596925eb566520d08cacf563d8cf02d5 *inst/doc/asymmetric.Rmd
-982fa33f5dc2488ea8cbb20336f4215d *inst/doc/asymmetric.html
+6b3709abeec150b28d939f1db907e17c *inst/doc/asymmetric.Rmd
+869037b6b0cb1e8930ea4442b0c20c64 *inst/doc/asymmetric.html
 5e270ae6034b339c2a13d20a5f7d2dec *inst/doc/intro.R
 fc19825b417d491bb72abe811db2661f *inst/doc/intro.Rmd
 458ccbf44b94a247b514811d9d9890de *inst/doc/intro.html
@@ -79,7 +79,7 @@ b637ad65d6df2d7fc61fea2a8d22dd2c *inst/tinytest/test-vcov-sandwich.R
 e5fe7104ab20ad0132bd3aa95eae10f0 *inst/tinytest/test-vcov.R
 3da444e2c370415557aaf70845aaae32 *man/autoplot.Rd
 723c22f9c3604667eebc082d9ab1f22f *man/broom.Rd
-cc7265520c4049c94ed4ec68a1ffadbb *man/capybara-package.Rd
+d0107b812ffe4a49ce2bf057d77262b2 *man/capybara-package.Rd
 250227d3b913e20134cc00e00ff3ff23 *man/correia2019.Rd
 abd10f181749f90a1f7d1dcb7e4c75e6 *man/fe_table.Rd
 966ec40d284502f68ccf5ae39df0089c *man/feglm.Rd
@@ -104,7 +104,7 @@ d3e2ba24236199fbe2e0ce3158221db2 *man/vcov.feglm.Rd
 f09c06c6fe2ff075501daf16371dc688 *src/01_04_center_berge.h
 56125f642cd27972d8dc5a501624baef *src/01_05_center.h
 92e832e7faba9bccc3feeb6523efe5b6 *src/02_chol.h
-f2b80591ecd58531f00fc8d07b5f2bad *src/03_beta.h
+e871873bd1ff433df6d4d4cc59ebc212 *src/03_beta.h
 8adf116a42fa97bbcf7527d654228d5c *src/04_alpha.h
 aa7dc2ab4dc80a0512be0cb8510b87d6 *src/05_01_separation_helpers.h
 4a4c6a747700b7fcdaa4a379e4a3617a *src/05_02_separation_relu.h
@@ -116,8 +116,8 @@ c56a35c4f43bd6234ab6f4030e3ed87c *src/06_03_fit_links.h
 c4300bc26073cf81f76c469e1eb5cf32 *src/06_04_fit_drop.h
 678d5f4d6d10edb58b1cb8fefa24f0f0 *src/06_05_fit_vcov.h
 7316046b5ce260b6ecf6fbe18e1f74aa *src/06_06_fit_sums.h
-091d68de8f4c22466eaa045ecc2cb175 *src/07_lm.h
-0c0c73754001fbc0d90b55297bb3c74c *src/08_glm.h
+eaff60e908bebb57ccc5bd6a2f791dda *src/07_lm.h
+c8f32fff06235c3fe1b7cedb0938a8d0 *src/08_glm.h
 a207d925346aea4c21990c631b8c3cd3 *src/09_negbin.h
 cfaab6281e2c3187854caa693c5ef49e *src/10_fepoisson_asymmetric.h
 aec4587a227755bb635595df652d2601 *src/11_formula_parser.h
@@ -127,7 +127,7 @@ b42436bd3e9fc1832cff94fd02d42cee *src/Makevars.win
 1062ec55383e14a06f790d4b5b6b5c5d *src/cpp4r.cpp
 74b8b94f6d008db03901e504179dcad8 *tests/README.md
 c43f037deb93e1c919a944bc8ed9d36b *tests/tinytest.R
-596925eb566520d08cacf563d8cf02d5 *vignettes/asymmetric.Rmd
+6b3709abeec150b28d939f1db907e17c *vignettes/asymmetric.Rmd
 fc19825b417d491bb72abe811db2661f *vignettes/intro.Rmd
 87fed6e5057609ce28d513d4ae6ac294 *vignettes/references.bib
 35a0581b2a749c678e75a530a37ae88c *vignettes/separation.Rmd

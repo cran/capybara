@@ -373,14 +373,15 @@ and defaults to <code>0.5</code>, so if you don’t specify it,
 <div id="estimating-lower-and-upper-expectiles" class="section level2">
 <h2>Estimating lower and upper expectiles</h2>
 <p>Shifting <code>expectile</code> away from 0.5 lets you trace how the
-entire conditional distribution of <code>mpg</code> varies with
-<code>wt</code>, after absorbing the <code>cyl</code> fixed effects.</p>
+entire conditional distribution of <code>trade</code> varies with
+<code>ldist</code> and other predictors, after absorbing the
+exporter-year and importer-year fixed effects.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>ross2004_subset <span class="ot">&lt;-</span> ross2004[ross2004<span class="sc">$</span>year <span class="sc">%in%</span> <span class="fu">seq</span>(<span class="dv">1989</span>, <span class="dv">1999</span>, <span class="dv">5</span>), ]</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>ross2004_subset<span class="sc">$</span>trade <span class="ot">&lt;-</span> <span class="fu">exp</span>(ross2004_subset<span class="sc">$</span>ltrade)</span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>ross2004_subset<span class="sc">$</span>exp_year <span class="ot">&lt;-</span> <span class="fu">paste0</span>(ross2004_subset<span class="sc">$</span>ctry1, ross2004_subset<span class="sc">$</span>year)</span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>ross2004_subset<span class="sc">$</span>imp_year <span class="ot">&lt;-</span> <span class="fu">paste0</span>(ross2004_subset<span class="sc">$</span>ctry2, ross2004_subset<span class="sc">$</span>year)</span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co"># 10th expectile — sensitive to small values of mpg</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co"># 10th expectile — sensitive to small values of trade</span></span>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>fit10 <span class="ot">&lt;-</span> <span class="fu">fepoisson_asymmetric</span>(</span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  trade <span class="sc">~</span> ldist <span class="sc">+</span> border <span class="sc">+</span> comlang <span class="sc">+</span> colony <span class="sc">|</span> exp_year <span class="sc">+</span> imp_year,</span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="at">data    =</span> ross2004_subset,</span>
@@ -410,7 +411,7 @@ entire conditional distribution of <code>mpg</code> varies with
 <span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>Number of observations<span class="sc">:</span> Full <span class="dv">21450</span>; Missing <span class="dv">0</span>; Perfect classification <span class="dv">0</span> </span>
 <span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a></span>
 <span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>Number of Fisher Scoring iterations<span class="sc">:</span> <span class="dv">17</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># 90th expectile — sensitive to large values of mpg</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># 90th expectile — sensitive to large values of trade</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>fit90 <span class="ot">&lt;-</span> <span class="fu">fepoisson_asymmetric</span>(</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  trade <span class="sc">~</span> ldist <span class="sc">+</span> border <span class="sc">+</span> comlang <span class="sc">+</span> colony <span class="sc">|</span> exp_year <span class="sc">+</span> imp_year,</span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">data    =</span> ross2004_subset,</span>
